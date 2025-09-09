@@ -17,3 +17,8 @@ type Edge struct {
 	SourceHandle string `json:"sourceHandle"`
 	TargetHandle string `json:"targetHandle"`
 }
+
+type ScenarioPayload struct {
+	Blocks []Node `json:"blocks"`
+	Edges  []Edge `json:"edges"`
+}
