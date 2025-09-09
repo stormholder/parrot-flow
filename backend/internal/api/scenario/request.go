@@ -1,10 +1,10 @@
 package scenario
 
-import "parrotflow/pkg/shared"
+import "parrotflow/internal/api"
 
 type ScenarioQuery struct {
 	Name string   `json:"name,omitempty"`
 	Tags []string `json:"tags,omitempty"`
-	shared.PageQuery
-	shared.OrderByQuery
+	api.PageQuery
+	api.OrderByQuery
 }
