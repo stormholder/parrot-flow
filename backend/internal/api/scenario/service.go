@@ -2,6 +2,7 @@ package scenario
 
 import (
 	"encoding/json"
+	"parrotflow/internal/api"
 	"parrotflow/internal/models"
 	"parrotflow/pkg/shared"
 )
@@ -12,6 +13,10 @@ type ScenarioService struct {
 
 func NewScenarioService(store *ScenarioStore) *ScenarioService {
 	return &ScenarioService{store}
+}
+
+func (s *ScenarioService) FindMany(query ScenarioQuery) (api.Pages, error) {
+	return s.store.List(query)
 }
 
 func (s *ScenarioService) Create() (models.Scenario, error) {
@@ -46,5 +51,5 @@ func (s *ScenarioService) Create() (models.Scenario, error) {
 		Parameters: "",
 	}
 
-	return newScenario, nil
+	return s.store.Create(newScenario)
 }
