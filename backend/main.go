@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"parrotflow/internal/api/scenario"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/danielgtaylor/huma/v2/humacli"
 	"github.com/go-chi/chi/v5"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 
 	_ "github.com/danielgtaylor/huma/v2/formats/cbor"
 )
@@ -32,26 +35,13 @@ func FailOnError(err error, msg string) {
 }
 
 func main() {
-	// port := "8888"
-	// dbFile := "store.db"
-
-	// if fromEnv := os.Getenv("PORT"); fromEnv != "" {
-	// 	port = fromEnv
-	// }
-
-	// if dbPath := os.Getenv("DATABASE"); dbPath != "" {
-	// 	dbFile = dbPath
-	// }
-
-	// database, err := gorm.Open(sqlite.Open(dbFile), &gorm.Config{})
-
-	// FailOnError(err, "failed to connect to database")
-
-	// log.Printf("Starting up on http://localhost:%s", port)
-
-	// scenarioService := scenario.NewScenarioService(scenario.NewStore(database))
-
 	cli := humacli.New(func(hooks humacli.Hooks, options *Options) {
+		database, err := gorm.Open(sqlite.Open(options.DbPath), &gorm.Config{})
+		FailOnError(err, "failed to connect to database")
+
+		scenarioService := scenario.NewScenarioService(scenario.NewStore(database))
+		scenarioRoutes := scenario.New(scenarioService)
+
 		router := chi.NewMux()
 		api := humachi.New(router, huma.DefaultConfig("Parrot Flow API", "1.0.0"))
 
@@ -61,10 +51,17 @@ func main() {
 			Path:        "/",
 			Summary:     "Root",
 			Tags:        []string{"system"},
-		}, func(ctx context.Context, i *interface{}) (*GreetingOutput, error) {
+		}, func(ctx context.Context, i *struct{}) (*GreetingOutput, error) {
 			resp := &GreetingOutput{}
-			resp.Body.Message = fmt.Sprintf("Hello!")
+			resp.Body.Message = "Hello, world!"
 			return resp, nil
+		})
+
+		scenarioRoutes.RegisterRoutes(&api)
+
+		hooks.OnStart(func() {
+			fmt.Printf("Starting server on port %d...\n", options.Port)
+			http.ListenAndServe(fmt.Sprintf(":%d", options.Port), router)
 		})
 	})
 
