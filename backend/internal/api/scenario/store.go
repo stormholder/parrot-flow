@@ -49,10 +49,10 @@ func (s *ScenarioStore) List(query ScenarioQuery) (api.Pages, error) {
 	}
 	fmt.Println("Scenarios found: ", len(list))
 	return api.Pages{
-		Total:       int(count),
+		TotalItems:  int(count),
 		CurrentPage: query.Page,
-		PerPage:     query.PerPage,
-		Pages:       pages,
+		RowsPerPage: query.PerPage,
+		TotalPages:  pages,
 		Data:        list,
 	}, nil
 }

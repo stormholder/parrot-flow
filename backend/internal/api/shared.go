@@ -10,21 +10,21 @@ import (
 )
 
 type Pages struct {
-	Total       int         `json:"total"`
-	Pages       int         `json:"pages"`
-	PerPage     int         `json:"per_page"`
-	CurrentPage int         `json:"current_page"`
+	TotalItems  int         `json:"total"`
+	TotalPages  int         `json:"pages"`
+	RowsPerPage int         `json:"rpp"`
+	CurrentPage int         `json:"page"`
 	Data        interface{} `json:"data"`
 }
 
 type PageQuery struct {
-	Page    int `json:"page,omitempty"`
-	PerPage int `json:"per_page,omitempty"`
+	Page    int `json:"page,omitempty" query:"page"`
+	PerPage int `json:"per_page,omitempty" query:"rpp"`
 }
 
 type OrderByQuery struct {
-	Field     string `json:"field,omitempty"`
-	Direction string `json:"direction,omitempty"`
+	Field     string `json:"field,omitempty" query:"order"`
+	Direction string `json:"direction,omitempty" query:"dir"`
 }
 
 type GenericQuery struct {

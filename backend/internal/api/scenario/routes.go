@@ -2,12 +2,15 @@ package scenario
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"parrotflow/internal/api"
-
 	"github.com/danielgtaylor/huma/v2"
+)
+
+var (
+	apiTag = "Scenario"
 )
 
 type ScenarioResource struct {
@@ -26,7 +29,7 @@ func (rs *ScenarioResource) RegisterRoutes(apiBase *huma.API) {
 		Path:        fmt.Sprintf("%s/", prefix),
 		Summary:     "Get scenarios",
 		Description: "Get a list of scenarios by criteria",
-		Tags:        []string{"scenario"},
+		Tags:        []string{apiTag},
 	}, rs.GetScenarios)
 	huma.Register(*apiBase, huma.Operation{
 		OperationID:   "create-scenario",
@@ -34,17 +37,42 @@ func (rs *ScenarioResource) RegisterRoutes(apiBase *huma.API) {
 		Path:          fmt.Sprintf("%s/", prefix),
 		Summary:       "Create new scenario",
 		Description:   "Create an empty new scenario",
-		Tags:          []string{"scenario"},
+		Tags:          []string{apiTag},
 		DefaultStatus: http.StatusCreated,
 	}, rs.CreateScenario)
+	huma.Register(*apiBase, huma.Operation{
+		OperationID: "get-scenario",
+		Method:      http.MethodGet,
+		Path:        fmt.Sprintf("%s/{id}", prefix),
+		Summary:     "Get a specific scenario",
+		Description: "Get a specific scenario by ID",
+		Tags:        []string{apiTag},
+	}, rs.GetScenario)
 }
 
-func (rs *ScenarioResource) GetScenarios(ctx context.Context, query *ScenarioQuery) (*api.Pages, error) {
-	resp, err := rs.service.FindMany(*query)
+func (rs *ScenarioResource) GetScenarios(ctx context.Context, query *ScenarioQuery) (*ScenarioListResponse, error) {
+	list, err := rs.service.FindMany(*query)
 	if err != nil {
-		return &resp, err
+		return nil, err
 	}
-	return &resp, nil
+	resp := &ScenarioListResponse{}
+	resp.Body.Pages = list
+	return resp, nil
+}
+
+func (rs *ScenarioResource) GetScenario(ctx context.Context, input *GetScenarioByIDRequest) (*ScenarioResponse, error) {
+	scenario, err := rs.service.FindOne(input.ID)
+	if err != nil {
+		return nil, huma.Error404NotFound("scenario not found")
+	}
+	var payload ScenarioPayload
+	if err := json.Unmarshal([]byte(scenario.Payload), &payload); err != nil {
+		return nil, err
+	}
+	resp := &ScenarioResponse{}
+	resp.Body.ScenarioBase = scenario.ScenarioBase
+	resp.Body.Payload = payload
+	return resp, nil
 }
 
 func (rs *ScenarioResource) CreateScenario(ctx context.Context, i *struct{}) (*ScenarioCreateResponse, error) {

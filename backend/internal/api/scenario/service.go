@@ -19,6 +19,10 @@ func (s *ScenarioService) FindMany(query ScenarioQuery) (api.Pages, error) {
 	return s.store.List(query)
 }
 
+func (s *ScenarioService) FindOne(id uint) (models.Scenario, error) {
+	return s.store.GetByID(id)
+}
+
 func (s *ScenarioService) Create() (models.Scenario, error) {
 	var blocks []Node = make([]Node, 1)
 	newId := shared.CustomUUID()

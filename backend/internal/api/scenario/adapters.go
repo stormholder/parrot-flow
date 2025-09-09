@@ -38,9 +38,9 @@ func GetScenarioListResponse(pages api.Pages) api.Pages {
 	}
 	return api.Pages{
 		CurrentPage: pages.CurrentPage,
-		Total:       pages.Total,
-		PerPage:     pages.PerPage,
-		Pages:       pages.Pages,
+		TotalItems:  pages.TotalItems,
+		RowsPerPage: pages.RowsPerPage,
+		TotalPages:  pages.TotalPages,
 		Data:        list,
 	}
 }
