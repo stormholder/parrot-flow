@@ -2,11 +2,12 @@ package scenario
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	"parrotflow/internal/api"
+
+	"github.com/danielgtaylor/huma/v2"
 )
 
 type ScenarioResource struct {
@@ -17,47 +18,41 @@ func New(service *ScenarioService) *ScenarioResource {
 	return &ScenarioResource{service}
 }
 
-func PostCtx(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), "id", chi.URLParam(r, "id"))
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+func (rs *ScenarioResource) RegisterRoutes(apiBase *huma.API) {
+	prefix := "/api/scenarios"
+	huma.Register(*apiBase, huma.Operation{
+		OperationID: "get-scenarios",
+		Method:      http.MethodGet,
+		Path:        fmt.Sprintf("%s/", prefix),
+		Summary:     "Get scenarios",
+		Description: "Get a list of scenarios by criteria",
+		Tags:        []string{"scenario"},
+	}, rs.GetScenarios)
+	huma.Register(*apiBase, huma.Operation{
+		OperationID:   "create-scenario",
+		Method:        http.MethodPost,
+		Path:          fmt.Sprintf("%s/", prefix),
+		Summary:       "Create new scenario",
+		Description:   "Create an empty new scenario",
+		Tags:          []string{"scenario"},
+		DefaultStatus: http.StatusCreated,
+	}, rs.CreateScenario)
 }
 
-func (rs *ScenarioResource) List(w http.ResponseWriter, r *http.Request) {
-	query := GetScenarioQuery(r.URL.Query())
-
-	resp, err := rs.service.FindMany(query)
+func (rs *ScenarioResource) GetScenarios(ctx context.Context, query *ScenarioQuery) (*api.Pages, error) {
+	resp, err := rs.service.FindMany(*query)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return &resp, err
 	}
-	w.Header().Set("Content-Type", "application/json")
-
-	response := GetScenarioListResponse(resp)
-
-	if err = json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	return &resp, nil
 }
 
-func (rs *ScenarioResource) Create(w http.ResponseWriter, r *http.Request) {
+func (rs *ScenarioResource) CreateScenario(ctx context.Context, i *struct{}) (*ScenarioCreateResponse, error) {
 	newScenario, err := rs.service.Create()
-
 	if err != nil {
-		fmt.Printf("Caught error while creating entity: \"%s\" \n", err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return nil, err
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	err = json.NewEncoder(w).Encode(newScenario)
-
-	if err != nil {
-		fmt.Printf("Caught error while serializing: \"%s\" \n", err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	resp := &ScenarioCreateResponse{}
+	resp.Body.Scenario = newScenario
+	return resp, nil
 }
