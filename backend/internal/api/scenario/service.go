@@ -34,11 +34,11 @@ func (s *ScenarioService) Create() (models.Scenario, error) {
 		},
 	}
 	var edges []Edge = make([]Edge, 0)
-	payload := ScenarioPayload{
+	context := ScenarioContext{
 		Blocks: blocks,
 		Edges:  edges,
 	}
-	byteStr, err := json.Marshal(payload)
+	byteStr, err := json.Marshal(context)
 
 	if err != nil {
 		return models.Scenario{}, err
@@ -50,7 +50,7 @@ func (s *ScenarioService) Create() (models.Scenario, error) {
 		ScenarioBase: models.ScenarioBase{
 			Name: "New Scenario",
 		},
-		Payload:    payloadStr,
+		Context:    payloadStr,
 		InputData:  "",
 		Parameters: "",
 	}
@@ -76,12 +76,12 @@ func (s *ScenarioService) Update(id uint, patch ScenarioPatch) (*models.Scenario
 	if patch.Tag != nil {
 		scenario.Tag = *patch.Tag
 	}
-	if patch.Payload != nil {
-		jsonString, err := json.Marshal(patch.Payload)
+	if patch.Context != nil {
+		jsonString, err := json.Marshal(patch.Context)
 		if err != nil {
 			return nil, err
 		}
-		scenario.Payload = string(jsonString)
+		scenario.Context = string(jsonString)
 	}
 	if patch.InputData != nil {
 		jsonString, err := json.Marshal(patch.InputData)

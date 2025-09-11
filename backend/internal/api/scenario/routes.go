@@ -84,13 +84,13 @@ func (rs *ScenarioResource) GetScenario(ctx context.Context, input *GetScenarioB
 	if err != nil {
 		return nil, huma.Error404NotFound("scenario not found")
 	}
-	var payload ScenarioPayload
-	if err := json.Unmarshal([]byte(scenario.Payload), &payload); err != nil {
+	var context ScenarioContext
+	if err := json.Unmarshal([]byte(scenario.Context), &context); err != nil {
 		return nil, err
 	}
 	resp := &ScenarioResponse{}
 	resp.Body.ScenarioBase = scenario.ScenarioBase
-	resp.Body.Payload = payload
+	resp.Body.Payload = context
 	return resp, nil
 }
 

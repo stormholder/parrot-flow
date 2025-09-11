@@ -10,7 +10,7 @@ type ScenarioBase struct {
 
 type Scenario struct {
 	ScenarioBase
-	Payload    string `json:"payload" gorm:"not null"`
+	Context    string `json:"context" gorm:"not null"`
 	InputData  string `json:"input_data" gorm:"not null"`
 	Parameters string `json:"parameters" gorm:"not null"`
 }
