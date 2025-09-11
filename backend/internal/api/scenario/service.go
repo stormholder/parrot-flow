@@ -57,3 +57,57 @@ func (s *ScenarioService) Create() (models.Scenario, error) {
 
 	return s.store.Create(newScenario)
 }
+
+func (s *ScenarioService) Update(id uint, patch ScenarioPatch) (*models.Scenario, error) {
+	scenario, err := s.store.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if patch.Name != nil {
+		scenario.Name = *patch.Name
+	}
+	if patch.Description != nil {
+		scenario.Description = *patch.Description
+	}
+	if patch.Icon != nil {
+		scenario.Icon = *patch.Icon
+	}
+	if patch.Tag != nil {
+		scenario.Tag = *patch.Tag
+	}
+	if patch.Payload != nil {
+		jsonString, err := json.Marshal(patch.Payload)
+		if err != nil {
+			return nil, err
+		}
+		scenario.Payload = string(jsonString)
+	}
+	if patch.InputData != nil {
+		jsonString, err := json.Marshal(patch.InputData)
+		if err != nil {
+			return nil, err
+		}
+		scenario.InputData = string(jsonString)
+	}
+	if patch.Parameters != nil {
+		jsonString, err := json.Marshal(patch.Parameters)
+		if err != nil {
+			return nil, err
+		}
+		scenario.Parameters = string(jsonString)
+	}
+
+	updatedScenario, err := s.store.Update(scenario)
+	if err != nil {
+		return nil, err
+	}
+	return &updatedScenario, nil
+}
+
+func (s *ScenarioService) Delete(id uint) (*struct{}, error) {
+	if err := s.store.Delete(id); err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
