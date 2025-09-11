@@ -12,3 +12,10 @@ type ScenarioQuery struct {
 type GetScenarioByIDRequest struct {
 	ID uint `path:"id" required:"true"`
 }
+
+type ScenarioPatchRequest struct {
+	GetScenarioByIDRequest
+	Body struct {
+		ScenarioPatch
+	}
+}
