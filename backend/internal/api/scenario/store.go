@@ -80,6 +80,9 @@ func (s *ScenarioStore) Update(scenario models.Scenario) (models.Scenario, error
 	return scenario, nil
 }
 
-func (s *ScenarioStore) Delete(id uint) {
-	s.db.Delete(&models.Scenario{}, id)
+func (s *ScenarioStore) Delete(id uint) error {
+	if err := s.db.Delete(&models.Scenario{}, id); err != nil {
+		return err.Error
+	}
+	return nil
 }
