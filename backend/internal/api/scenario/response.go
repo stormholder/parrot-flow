@@ -8,7 +8,7 @@ import (
 type ScenarioResponse struct {
 	Body struct {
 		models.ScenarioBase
-		Payload ScenarioContext `json:"context"`
+		Context ScenarioContext `json:"context"`
 	}
 }
 

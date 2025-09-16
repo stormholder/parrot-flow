@@ -90,7 +90,7 @@ func (rs *ScenarioResource) GetScenario(ctx context.Context, input *GetScenarioB
 	}
 	resp := &ScenarioResponse{}
 	resp.Body.ScenarioBase = scenario.ScenarioBase
-	resp.Body.Payload = context
+	resp.Body.Context = context
 	return resp, nil
 }
 

@@ -48,13 +48,3 @@ type ScenarioNodeParameters struct {
 }
 
 type ScenarioInputData []ScenarioNodeParameters
-
-type ScenarioPatch struct {
-	Name        *string                 `json:"name,omitempty"`
-	Description *string                 `json:"description,omitempty"`
-	Tag         *string                 `json:"tag,omitempty"`
-	Icon        *string                 `json:"icon,omitempty"`
-	Context     *ScenarioContext        `json:"context,omitempty"`
-	InputData   *interface{}            `json:"input_data,omitempty"`
-	Parameters  *ScenarioNodeParameters `json:"parameters,omitempty"`
-}
