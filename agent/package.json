@@ -1,0 +1,46 @@
+{
+  "name": "agent",
+  "version": "1.0.0",
+  "description": "Browser Automation Agent",
+  "keywords": [
+    "automation",
+    "playwright",
+    "browser",
+    "headless",
+    "browser-automation",
+    "automation-agent"
+  ],
+  "homepage": "https://github.com/stormholder/parrot-flow#readme",
+  "bugs": {
+    "url": "https://github.com/stormholder/parrot-flow/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stormholder/parrot-flow.git"
+  },
+  "license": "GPL-3.0",
+  "author": "Stormholder <dantedmc78@gmail.com>",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@playwright/browser-chromium": "^1.55.0",
+    "@playwright/browser-firefox": "^1.55.0",
+    "@playwright/browser-webkit": "^1.55.0",
+    "dotenv": "^17.2.2",
+    "env-var": "^7.5.0",
+    "nanoid": "^5.1.5",
+    "playwright": "^1.55.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/nanoid": "^2.1.0",
+    "@types/node": "^24.5.0",
+    "esbuild": "^0.25.9",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
