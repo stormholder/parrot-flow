@@ -1,0 +1,57 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Browser Automation Agent",
+  "keywords": [
+    "automation",
+    "playwright",
+    "browser",
+    "headless",
+    "browser-automation",
+    "automation-agent",
+    "workflow",
+    "scenario"
+  ],
+  "homepage": "https://github.com/stormholder/parrot-flow#readme",
+  "bugs": {
+    "url": "https://github.com/stormholder/parrot-flow/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stormholder/parrot-flow.git"
+  },
+  "license": "GPL-3.0",
+  "author": "Stormholder <dantedmc78@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "axios": "^1.12.2",
+    "nanoid": "^5.1.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.1",
+    "reactflow": "^11.11.4",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.39.1",
+    "vite": "^7.1.2"
+  }
+}
