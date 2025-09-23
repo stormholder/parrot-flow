@@ -14,7 +14,7 @@ func Init(dbPath string) {
 		panic("failed to connect to database")
 	}
 
-	database.AutoMigrate(&models.Scenario{})
+	database.AutoMigrate(&models.Scenario{}, &models.ScenarioRun{})
 
 	// database.AutoMigrate(&db.WebSite{}, &db.Proxy{}, &db.Scenario{}, &db.ExecutionBlob{}, &db.Execution{})
 }

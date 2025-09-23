@@ -10,3 +10,12 @@ type RunQuery struct {
 	api.PageQuery
 	api.OrderByQuery
 }
+
+type GetRunByIDRequest struct {
+	ID uint `path:"id" required:"true"`
+}
+
+type RunCommandRequest struct {
+	GetRunByIDRequest
+	Command string `json:"command"` // could be "start" | "stop" | "pause" | "resume" | "restart"
+}
