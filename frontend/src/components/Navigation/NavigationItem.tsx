@@ -2,7 +2,6 @@ import { NavLink } from "react-router-dom";
 import type { NavMenuItemProps } from "./types";
 
 export const NavigationItem = ({
-  id,
   name,
   link,
   icon: Icon,
@@ -12,7 +11,6 @@ export const NavigationItem = ({
   return (
     <NavLink
       to={link}
-      key={id}
       className={({ isActive }) => {
         return isActive
           ? `${baseClasses} font-semibold bg-black text-white dark:bg-white dark:text-black`
