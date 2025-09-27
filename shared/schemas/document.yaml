@@ -1,0 +1,526 @@
+components:
+  schemas:
+    Edge:
+      additionalProperties: false
+      properties:
+        condition:
+          type: string
+        id:
+          type: string
+        source:
+          type: string
+        sourceHandle:
+          type: string
+        target:
+          type: string
+        targetHandle:
+          type: string
+      required:
+        - id
+        - source
+        - target
+        - sourceHandle
+        - targetHandle
+      type: object
+    ErrorDetail:
+      additionalProperties: false
+      properties:
+        location:
+          description: Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
+          type: string
+        message:
+          description: Error message text
+          type: string
+        value:
+          description: The value at the given location
+      type: object
+    ErrorModel:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ErrorModel.json
+          format: uri
+          readOnly: true
+          type: string
+        detail:
+          description: A human-readable explanation specific to this occurrence of the problem.
+          examples:
+            - Property foo is required but is missing.
+          type: string
+        errors:
+          description: Optional list of individual error details
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+          type:
+            - array
+            - "null"
+        instance:
+          description: A URI reference that identifies the specific occurrence of the problem.
+          examples:
+            - https://example.com/error-log/abc123
+          format: uri
+          type: string
+        status:
+          description: HTTP status code
+          examples:
+            - 400
+          format: int64
+          type: integer
+        title:
+          description: A short, human-readable summary of the problem type. This value should not change between occurrences of the error.
+          examples:
+            - Bad Request
+          type: string
+        type:
+          default: about:blank
+          description: A URI reference to human-readable documentation for the error.
+          examples:
+            - https://example.com/errors/example
+          format: uri
+          type: string
+      type: object
+    GreetingOutputBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GreetingOutputBody.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Greeting message
+          examples:
+            - Hello, world!
+          type: string
+      required:
+        - message
+      type: object
+    Node:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        position:
+          $ref: "#/components/schemas/Point2D"
+        type:
+          type: string
+      required:
+        - id
+        - type
+        - position
+      type: object
+    Point2D:
+      additionalProperties: false
+      properties:
+        x:
+          format: float
+          type: number
+        "y":
+          format: float
+          type: number
+      required:
+        - x
+        - "y"
+      type: object
+    ScenarioBlockParameter:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        value: {}
+      required:
+        - name
+        - value
+      type: object
+    ScenarioContext:
+      additionalProperties: false
+      properties:
+        blocks:
+          items:
+            $ref: "#/components/schemas/Node"
+          type:
+            - array
+            - "null"
+        edges:
+          items:
+            $ref: "#/components/schemas/Edge"
+          type:
+            - array
+            - "null"
+      required:
+        - blocks
+        - edges
+      type: object
+    ScenarioCreateResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ScenarioCreateResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        context:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        id:
+          format: int64
+          minimum: 0
+          type: integer
+        input_data:
+          type: string
+        name:
+          type: string
+        parameters:
+          type: string
+        tag:
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+        - context
+        - input_data
+        - parameters
+        - name
+        - id
+        - created_at
+        - updated_at
+      type: object
+    ScenarioListResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ScenarioListResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        data: {}
+        page:
+          format: int64
+          type: integer
+        pages:
+          format: int64
+          type: integer
+        rpp:
+          format: int64
+          type: integer
+        total:
+          format: int64
+          type: integer
+      required:
+        - total
+        - pages
+        - rpp
+        - page
+        - data
+      type: object
+    ScenarioNodeParameters:
+      additionalProperties: false
+      properties:
+        blockId:
+          type: string
+        input:
+          items:
+            $ref: "#/components/schemas/ScenarioBlockParameter"
+          type:
+            - array
+            - "null"
+        output:
+          items:
+            $ref: "#/components/schemas/ScenarioBlockParameter"
+          type:
+            - array
+            - "null"
+      required:
+        - blockId
+        - input
+        - output
+      type: object
+    ScenarioPatchRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ScenarioPatchRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        context:
+          $ref: "#/components/schemas/ScenarioContext"
+        description:
+          type: string
+        icon:
+          type: string
+        input_data: {}
+        name:
+          type: string
+        parameters:
+          $ref: "#/components/schemas/ScenarioNodeParameters"
+        tag:
+          type: string
+      type: object
+    ScenarioResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ScenarioResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        context:
+          $ref: "#/components/schemas/ScenarioContext"
+        created_at:
+          format: date-time
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        id:
+          format: int64
+          minimum: 0
+          type: integer
+        name:
+          type: string
+        tag:
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+        - context
+        - name
+        - id
+        - created_at
+        - updated_at
+      type: object
+info:
+  title: Parrot Flow API
+  version: 1.0.0
+openapi: 3.1.0
+paths:
+  /:
+    get:
+      operationId: root
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GreetingOutputBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Root
+      tags:
+        - system
+  /api/scenarios/:
+    get:
+      description: Get a list of scenarios by criteria
+      operationId: get-scenarios
+      parameters:
+        - explode: false
+          in: query
+          name: name
+          schema:
+            type: string
+        - explode: false
+          in: query
+          name: tags
+          schema:
+            items:
+              type: string
+            type:
+              - array
+              - "null"
+        - explode: false
+          in: query
+          name: page
+          schema:
+            format: int64
+            type: integer
+        - explode: false
+          in: query
+          name: rpp
+          schema:
+            format: int64
+            type: integer
+        - explode: false
+          in: query
+          name: order
+          schema:
+            type: string
+        - explode: false
+          in: query
+          name: dir
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScenarioListResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get scenarios
+      tags:
+        - Scenario
+    post:
+      description: Create an empty new scenario
+      operationId: create-scenario
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScenarioCreateResponseBody"
+          description: Created
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Create new scenario
+      tags:
+        - Scenario
+  /api/scenarios/{id}:
+    delete:
+      description: Delete a specific scenario by ID
+      operationId: delete-scenario
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: int64
+            minimum: 0
+            type: integer
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete a specific scenario
+      tags:
+        - Scenario
+    get:
+      description: Get a specific scenario by ID
+      operationId: get-scenario
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: int64
+            minimum: 0
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScenarioResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a specific scenario
+      tags:
+        - Scenario
+    patch:
+      description: Update a specific scenario by ID
+      operationId: update-scenario
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: int64
+            minimum: 0
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioPatchRequestBody"
+        required: true
+      responses:
+        "204":
+          description: No Content
+          headers:
+            Context:
+              schema:
+                type: string
+            CreatedAt:
+              schema:
+                type: string
+            Description:
+              schema:
+                type: string
+            ID:
+              schema:
+                format: int64
+                minimum: 0
+                type: integer
+            Icon:
+              schema:
+                type: string
+            InputData:
+              schema:
+                type: string
+            Name:
+              schema:
+                type: string
+            Parameters:
+              schema:
+                type: string
+            Tag:
+              schema:
+                type: string
+            UpdatedAt:
+              schema:
+                type: string
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update a specific scenario
+      tags:
+        - Scenario
