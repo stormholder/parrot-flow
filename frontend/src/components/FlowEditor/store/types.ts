@@ -16,6 +16,7 @@ export type NewNodeProps = {
     x: number;
     y: number;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
 };
 
@@ -34,7 +35,11 @@ export type RFState = {
     handleType: HandleType
   ) => void;
   onEdgeUpdate: (oldEdge: Edge, newConnection: Connection) => void;
-  onEdgeUpdateEnd: (event: any, edge: Edge, handleType: HandleType) => void;
+  onEdgeUpdateEnd: (
+    event: React.MouseEvent,
+    edge: Edge,
+    handleType: HandleType
+  ) => void;
   onConnect: OnConnect;
   appendNode: (nodeProps: NewNodeProps) => void;
   appendEdge: (edgeProps: NewEdgeProps) => void;

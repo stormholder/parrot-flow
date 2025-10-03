@@ -23,7 +23,7 @@ const initialNodes: Node[] = [];
 
 const initialEdges: Edge[] = [];
 
-const useStore = create<RFState>((set, get) => ({
+const useStore = create<RFState>()((set, get) => ({
   edgeUpdateSuccessful: true,
   nodes: initialNodes,
   edges: initialEdges,
@@ -61,18 +61,20 @@ const useStore = create<RFState>((set, get) => ({
       edges: addEdge(newEdge, get().edges),
     });
   },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onEdgeUpdateStart: (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _event: React.MouseEvent,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _edge: Edge,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _handle: HandleType
   ) => {
     get().edgeUpdateSuccessful = false;
   },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onEdgeUpdateEnd: (
     _event: React.MouseEvent,
     edge: Edge,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _handle: HandleType
   ) => {
     if (!get().edgeUpdateSuccessful) {
