@@ -1,5 +1,7 @@
 # Parrot-flow
 
+![alt text](shared/docs/test_scenario.png)
+
 A powerful visual workflow editor that enables seamless browser automation through a distributed server architecture, multiple browser agents, and an intuitive web interface for creating and managing automation workflows.
 
 ## Features
