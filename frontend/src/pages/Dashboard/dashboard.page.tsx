@@ -1,7 +1,7 @@
-import { useState } from "react";
+// import { useState } from "react";
 
 const DashboardPage = () => {
-  const [count, setCount] = useState(0);
+  // const [count, setCount] = useState(0);
   return (
     <>
       {/* <Title>Vite + React + Radix</Title>

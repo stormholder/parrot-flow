@@ -22,18 +22,16 @@ export const router = createBrowserRouter([
         path: "scenarios",
         loader: ScenarioListLoader,
         element: <ScenarioListPage />,
-        children: [
-          {
-            path: ":scenarioId",
-            loader: ScenarioItemLoader,
-            element: <ScenarioItemPage />,
-          },
-          {
-            path: ":scenarioId/flow",
-            loader: ScenarioItemLoader,
-            element: <ScenarioFlowPage />,
-          },
-        ],
+      },
+      {
+        path: "scenarios/:scenarioId",
+        loader: ScenarioItemLoader,
+        element: <ScenarioItemPage />,
+      },
+      {
+        path: "scenarios/:scenarioId/flow",
+        loader: ScenarioItemLoader,
+        element: <ScenarioFlowPage />,
       },
     ],
   },
