@@ -32,7 +32,7 @@ A powerful visual workflow editor that enables seamless browser automation throu
 
 This project is licensed under the GNU GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Playwright**: For browser automation foundation
 - **React-Flow**: For drag-and-drop workflow editing foundation
