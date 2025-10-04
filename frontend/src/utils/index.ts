@@ -2,6 +2,12 @@ import { customAlphabet } from "nanoid/non-secure";
 
 export const clsx = (...parts: string[]): string => parts.join(" ");
 
+export const isAppleOS = () =>
+  window.navigator.platform.startsWith("Mac") ||
+  window.navigator.platform.startsWith("iPhone") ||
+  window.navigator.platform.startsWith("iPad") ||
+  window.navigator.platform.startsWith("iPod");
+
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
