@@ -1,3 +1,4 @@
+import type { Edge, Node } from "@/api-client";
 import type { BaseDraggableNode, NodeIO } from "@shared/types/nodes";
 import type { IconType } from "react-icons";
 import type { NodeProps } from "reactflow";
@@ -35,4 +36,17 @@ export interface BaseNodeParamProps {
   id: string;
   label: string;
   type: string;
+}
+
+export interface FlowViewProps {
+  nodes: Node[];
+  edges: Edge[];
+}
+
+export interface FlowProps extends FlowViewProps {
+  showAside: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  parameters?: any;
+  onScenarioChange?: ({ nodes, edges }: FlowViewProps) => void;
+  onNodeSelectionChange?: (nodeId: string | undefined) => void;
 }
