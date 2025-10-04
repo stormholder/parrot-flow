@@ -1,24 +1,10 @@
 import ReactFlow, { MiniMap, Background } from "reactflow";
 import "reactflow/dist/style.css";
-import { nodes as toolboxNodes } from "../model/nodes";
-import type { Edge, Node } from "@/api-client";
-import type { Node as RFNode } from "reactflow";
 import useStore from "../store";
 import { useState } from "react";
 import nodeTypes from "./nodes";
-import type { NodeTypes } from "@shared/types/nodes";
-import type { DraggableNode } from "../model";
-export interface FlowViewProps {
-  nodes: Node[];
-  edges: Edge[];
-}
-
-const getNodeColor = (n: RFNode<DraggableNode>): string => {
-  if (n.style?.backgroundColor) return n.style?.backgroundColor;
-  if (!!n.type && n.type in toolboxNodes)
-    return toolboxNodes[n.type as NodeTypes].color!;
-  return "#e2e2e2";
-};
+import type { FlowViewProps } from "../model";
+import { getNodeColor } from "../model/configuration";
 
 function FlowView(props: Readonly<FlowViewProps>) {
   const [isInitialRender, setIsInitialRender] = useState<boolean>(true);
