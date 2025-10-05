@@ -29,6 +29,7 @@ type Scenario struct {
 	Parameters  Parameters
 	CreatedAt   shared.Timestamp
 	UpdatedAt   shared.Timestamp
+	Events      []shared.DomainEvent
 }
 
 func NewScenario(id ScenarioID, name string) (*Scenario, error) {
@@ -41,7 +42,14 @@ func NewScenario(id ScenarioID, name string) (*Scenario, error) {
 		Name:      name,
 		CreatedAt: shared.NewTimestamp(time.Now()),
 		UpdatedAt: shared.NewTimestamp(time.Now()),
+		Events:    make([]shared.DomainEvent, 0),
 	}
+
+	scenario.addEvent(ScenarioCreated{
+		BaseEvent:  shared.NewBaseEvent(EventScenarioCreated, id.String()),
+		ScenarioID: id.String(),
+		Name:       name,
+	})
 
 	return scenario, nil
 }
@@ -83,4 +91,12 @@ func (s *Scenario) UpdateInputData(inputData InputData) {
 func (s *Scenario) UpdateParameters(parameters Parameters) {
 	s.Parameters = parameters
 	s.UpdatedAt = shared.NewTimestamp(time.Now())
+}
+
+func (s *Scenario) addEvent(event shared.DomainEvent) {
+	s.Events = append(s.Events, event)
+}
+
+func (s *Scenario) ClearEvents() {
+	s.Events = make([]shared.DomainEvent, 0)
 }

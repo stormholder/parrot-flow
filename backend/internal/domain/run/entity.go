@@ -28,6 +28,7 @@ type Run struct {
 	FinishedAt *shared.Timestamp
 	CreatedAt  shared.Timestamp
 	UpdatedAt  shared.Timestamp
+	Events     []shared.DomainEvent
 }
 
 func NewRun(id RunID, scenarioID scenario.ScenarioID, parameters string) (*Run, error) {
@@ -42,7 +43,15 @@ func NewRun(id RunID, scenarioID scenario.ScenarioID, parameters string) (*Run, 
 		Parameters: parameters,
 		CreatedAt:  shared.NewTimestamp(time.Now()),
 		UpdatedAt:  shared.NewTimestamp(time.Now()),
+		Events:     make([]shared.DomainEvent, 0),
 	}
+
+	run.addEvent(RunCreated{
+		BaseEvent:  shared.NewBaseEvent(EventRunCreated, id.String()),
+		RunID:      id.String(),
+		ScenarioID: scenarioID.String(),
+		Parameters: parameters,
+	})
 
 	return run, nil
 }
@@ -57,6 +66,13 @@ func (r *Run) Start() error {
 	r.StartedAt = &startedAt
 	r.UpdatedAt = shared.NewTimestamp(time.Now())
 
+	r.addEvent(RunStarted{
+		BaseEvent:  shared.NewBaseEvent(EventRunStarted, r.Id.String()),
+		RunID:      r.Id.String(),
+		ScenarioID: r.ScenarioID.String(),
+		StartedAt:  r.StartedAt.Time(),
+	})
+
 	return nil
 }
 
@@ -69,6 +85,13 @@ func (r *Run) Complete() error {
 	finishedAt := shared.NewTimestamp(time.Now())
 	r.FinishedAt = &finishedAt
 	r.UpdatedAt = shared.NewTimestamp(time.Now())
+
+	r.addEvent(RunCompleted{
+		BaseEvent:  shared.NewBaseEvent(EventRunCompleted, r.Id.String()),
+		RunID:      r.Id.String(),
+		ScenarioID: r.ScenarioID.String(),
+		FinishedAt: r.FinishedAt.Time(),
+	})
 
 	return nil
 }
@@ -83,6 +106,14 @@ func (r *Run) Fail(reason string) error {
 	r.FinishedAt = &finishedAt
 	r.UpdatedAt = shared.NewTimestamp(time.Now())
 
+	r.addEvent(RunFailed{
+		BaseEvent:  shared.NewBaseEvent(EventRunFailed, r.Id.String()),
+		RunID:      r.Id.String(),
+		ScenarioID: r.ScenarioID.String(),
+		Reason:     reason,
+		FailedAt:   r.FinishedAt.Time(),
+	})
+
 	return nil
 }
 
@@ -96,5 +127,20 @@ func (r *Run) Cancel() error {
 	r.FinishedAt = &finishedAt
 	r.UpdatedAt = shared.NewTimestamp(time.Now())
 
+	r.addEvent(RunCancelled{
+		BaseEvent:   shared.NewBaseEvent(EventRunCancelled, r.Id.String()),
+		RunID:       r.Id.String(),
+		ScenarioID:  r.ScenarioID.String(),
+		CancelledAt: r.FinishedAt.Time(),
+	})
+
 	return nil
+}
+
+func (r *Run) addEvent(event shared.DomainEvent) {
+	r.Events = append(r.Events, event)
+}
+
+func (r *Run) ClearEvents() {
+	r.Events = make([]shared.DomainEvent, 0)
 }
