@@ -49,6 +49,13 @@ func main() {
 		runRepository := persistence.NewRunRepository(database)
 
 		eventBus := events.NewAsyncEventBus()
+		eventBus.Subscribe(events.NewScenarioCreatedHandler())
+		eventBus.Subscribe(events.NewScenarioUpdatedHandler())
+		eventBus.Subscribe(events.NewScenarioDeletedHandler())
+		eventBus.Subscribe(events.NewRunCreatedHandler())
+		eventBus.Subscribe(events.NewRunStartedHandler())
+		eventBus.Subscribe(events.NewRunCompletedHandler())
+		eventBus.Subscribe(events.NewRunFailedHandler())
 
 		router := chi.NewMux()
 		api := humachi.New(router, huma.DefaultConfig("Parrot Flow API", "1.0.0"))
