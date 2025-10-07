@@ -4,6 +4,8 @@ import (
 	"net/http"
 	commandRun "parrotflow/internal/application/command/run"
 	queryRun "parrotflow/internal/application/query/run"
+	"parrotflow/internal/infrastructure/events"
+	"parrotflow/internal/infrastructure/persistence"
 	"parrotflow/internal/interfaces/http/handlers"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -16,16 +18,15 @@ var (
 
 func RegisterRunRoutes(
 	api *huma.API,
-	createHandler *commandRun.CreateRunCommandHandler,
-	startHandler *commandRun.StartRunCommandHandler,
-	getHandler *queryRun.GetRunQueryHandler,
-	listHandler *queryRun.ListRunsQueryHandler,
+	runRepository *persistence.RunRepository,
+	scenarioRepository *persistence.ScenarioRepository,
+	eventBus *events.AsyncEventBus,
 ) {
 	runHandler := handlers.NewRunHandler(
-		createHandler,
-		startHandler,
-		getHandler,
-		listHandler,
+		commandRun.NewCreateRunCommandHandler(runRepository, scenarioRepository, eventBus),
+		commandRun.NewStartRunCommandHandler(runRepository, eventBus),
+		queryRun.NewGetRunQueryHandler(runRepository),
+		queryRun.NewListRunsQueryHandler(runRepository),
 	)
 
 	huma.Register(*api, huma.Operation{

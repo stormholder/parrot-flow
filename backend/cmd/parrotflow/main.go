@@ -1,17 +1,67 @@
 package main
 
 import (
-	"flag"
-	"parrotflow/cmd/parrotflow/migrations"
+	"fmt"
+	"log"
+	"net/http"
+	"parrotflow/internal/infrastructure/events"
+	"parrotflow/internal/infrastructure/persistence"
+	"parrotflow/internal/interfaces/http/routes"
+	"parrotflow/internal/models"
+
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
+	"github.com/danielgtaylor/huma/v2/humacli"
+	"github.com/go-chi/chi/v5"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-var (
-	dbPath string
-)
+type Options struct {
+	Port   int    `help:"Port to listen on" short:"p" default:"8888"`
+	DbPath string `help:"Database file path" short:"d" default:"store.db"`
+}
+
+type GreetingOutput struct {
+	Body struct {
+		Message string `json:"message" example:"Hello, world!" doc:"Greeting message"`
+	}
+}
+
+func FailOnError(err error, msg string) {
+	if err != nil {
+		log.Panicf("%s: %s", msg, err)
+	}
+}
 
 func main() {
-	flag.StringVar(&dbPath, "database", "store.db", "Database file path")
-	flag.Parse()
+	cli := humacli.New(func(hooks humacli.Hooks, options *Options) {
+		database, err := gorm.Open(sqlite.Open(options.DbPath), &gorm.Config{})
+		FailOnError(err, "failed to connect to database")
 
-	migrations.Init(dbPath)
+		err = database.AutoMigrate(
+			&models.Scenario{},
+			&models.ScenarioRun{},
+		)
+		FailOnError(err, "failed to migrate database")
+
+		scenarioRepository := persistence.NewScenarioRepository(database)
+		runRepository := persistence.NewRunRepository(database)
+
+		eventBus := events.NewAsyncEventBus()
+
+		router := chi.NewMux()
+		api := humachi.New(router, huma.DefaultConfig("Parrot Flow API", "1.0.0"))
+
+		routes.RegisterSystemRoutes(&api)
+		routes.RegisterScenarioRoutes(&api, scenarioRepository, eventBus)
+		routes.RegisterRunRoutes(&api, runRepository, scenarioRepository, eventBus)
+
+		hooks.OnStart(func() {
+			fmt.Printf("Starting server on port %d...\n", options.Port)
+			http.ListenAndServe(fmt.Sprintf(":%d", options.Port), router)
+		})
+	})
+
+	cli.Run()
 }

@@ -3,6 +3,8 @@ package routes
 import (
 	command "parrotflow/internal/application/command/scenario"
 	query "parrotflow/internal/application/query/scenario"
+	"parrotflow/internal/infrastructure/events"
+	"parrotflow/internal/infrastructure/persistence"
 	"parrotflow/internal/interfaces/http/handlers"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -10,18 +12,15 @@ import (
 
 func RegisterScenarioRoutes(
 	api *huma.API,
-	createHandler *command.CreateScenarioCommandHandler,
-	updateHandler *command.UpdateScenarioCommandHandler,
-	deleteHandler *command.DeleteScenarioCommandHandler,
-	getHandler *query.GetScenarioQueryHandler,
-	listHandler *query.ListScenariosQueryHandler,
+	scenarioRepository *persistence.ScenarioRepository,
+	eventBus *events.AsyncEventBus,
 ) {
 	scenarioHandler := handlers.NewScenarioHandler(
-		createHandler,
-		updateHandler,
-		deleteHandler,
-		getHandler,
-		listHandler,
+		command.NewCreateScenarioCommandHandler(scenarioRepository, eventBus),
+		command.NewUpdateScenarioCommandHandler(scenarioRepository, eventBus),
+		command.NewDeleteScenarioCommandHandler(scenarioRepository, eventBus),
+		query.NewGetScenarioQueryHandler(scenarioRepository),
+		query.NewListScenariosQueryHandler(scenarioRepository),
 	)
 
 	huma.Register(*api, huma.Operation{
