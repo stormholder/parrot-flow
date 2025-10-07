@@ -6,9 +6,9 @@ import (
 	queryRun "parrotflow/internal/application/query/run"
 	"parrotflow/internal/domain/run"
 	"parrotflow/internal/domain/scenario"
-	"parrotflow/internal/interfaces/http/commands"
-	"parrotflow/internal/interfaces/http/mappers"
-	"parrotflow/internal/interfaces/http/queries"
+	"parrotflow/internal/interfaces/http/dto/commands"
+	"parrotflow/internal/interfaces/http/dto/mappers"
+	"parrotflow/internal/interfaces/http/dto/queries"
 )
 
 type RunHandler struct {

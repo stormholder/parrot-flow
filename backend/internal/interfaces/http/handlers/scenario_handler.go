@@ -5,9 +5,9 @@ import (
 	command "parrotflow/internal/application/command/scenario"
 	query "parrotflow/internal/application/query/scenario"
 	"parrotflow/internal/domain/scenario"
-	"parrotflow/internal/interfaces/http/commands"
-	"parrotflow/internal/interfaces/http/mappers"
-	"parrotflow/internal/interfaces/http/queries"
+	"parrotflow/internal/interfaces/http/dto/commands"
+	"parrotflow/internal/interfaces/http/dto/mappers"
+	"parrotflow/internal/interfaces/http/dto/queries"
 )
 
 type ScenarioHandler struct {

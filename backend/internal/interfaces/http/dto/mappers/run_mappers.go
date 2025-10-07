@@ -2,8 +2,8 @@ package mappers
 
 import (
 	"parrotflow/internal/domain/run"
-	"parrotflow/internal/interfaces/http/commands"
-	"parrotflow/internal/interfaces/http/queries"
+	"parrotflow/internal/interfaces/http/dto/commands"
+	"parrotflow/internal/interfaces/http/dto/queries"
 )
 
 func ToGetRunResponse(run *run.Run) *queries.GetRunResponse {
