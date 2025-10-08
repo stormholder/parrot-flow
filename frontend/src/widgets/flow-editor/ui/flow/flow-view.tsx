@@ -1,6 +1,6 @@
 import ReactFlow, { MiniMap, Background } from "reactflow";
 import "reactflow/dist/style.css";
-import useStore from "../../store";
+import { useFlowStore } from "@/entities/flow";
 import { useState } from "react";
 import nodeTypes from "../nodes";
 import type { FlowViewProps } from "../../model";
@@ -14,7 +14,7 @@ function FlowView(props: Readonly<FlowViewProps>) {
     appendNode,
     appendEdge,
     clear: clearFlow,
-  } = useStore();
+  } = useFlowStore();
 
   if (isInitialRender) {
     setIsInitialRender(false);
