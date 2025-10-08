@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import type { NavMenuItemProps } from "./types";
+import type { NavMenuItemProps } from "../model/types";
 
 export const NavigationItem = ({
   name,

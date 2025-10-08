@@ -1,5 +1,5 @@
 import { TbPlayerPlayFilled } from "react-icons/tb";
-import BaseNode from "../BaseNode";
+import BaseNode from "./base-node";
 import { nodeColors } from "../../model/nodes";
 
 const StartNode = () => {

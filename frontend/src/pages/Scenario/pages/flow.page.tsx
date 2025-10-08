@@ -1,5 +1,5 @@
 import { scenario } from "@/../mock/scenario.mock";
-import FlowEditor from "@/widgets/flow-editor/ui/FlowEditor";
+import FlowEditor from "@/widgets/flow-editor/ui/flow/flow-editor";
 
 const ScenarioFlowPage = () => {
   return (

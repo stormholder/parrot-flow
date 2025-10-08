@@ -1,4 +1,4 @@
-import FlowView from "@/widgets/flow-editor/ui/FlowView";
+import FlowView from "@/widgets/flow-editor/ui/flow/flow-view";
 
 import { scenario } from "@/../mock/scenario.mock";
 

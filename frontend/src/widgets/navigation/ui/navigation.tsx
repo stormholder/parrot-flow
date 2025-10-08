@@ -1,7 +1,7 @@
 import type { FC, HTMLAttributes } from "react";
 
-import type { NavigationProps } from "./types";
-import { NavigationItem } from "./NavigationItem";
+import type { NavigationProps } from "../model/types";
+import { NavigationItem } from "./navigation-item";
 
 export const Navigation: FC<
   NavigationProps & HTMLAttributes<HTMLDivElement>

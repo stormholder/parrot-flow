@@ -1,5 +1,5 @@
 import type { CustomNodeProps } from "../../model";
-import BaseNode from "../BaseNode";
+import BaseNode from "./base-node";
 
 const InNode = ({ data }: CustomNodeProps) => {
   const { label, title, icon, color, inputs } = data;

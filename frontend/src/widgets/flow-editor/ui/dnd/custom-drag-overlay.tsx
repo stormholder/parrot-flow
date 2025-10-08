@@ -1,6 +1,6 @@
 import { DragOverlay, useDndContext } from "@dnd-kit/core";
 import type { NodeTypes } from "@shared/types/nodes";
-import { nodes } from "../model/nodes";
+import { nodes } from "../../model/nodes";
 
 const CustomDragOverlay = () => {
   const { active } = useDndContext();

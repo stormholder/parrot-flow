@@ -5,7 +5,7 @@ import type {
   BaseNodeBodySectionProps,
   BaseNodeParamProps,
   BaseNodeProps,
-} from "../model";
+} from "../../model";
 import { clsx } from "@/utils";
 
 const BaseNode = ({
