@@ -1,8 +1,8 @@
 import type { NodeTypes } from "@shared/types/nodes";
-import StartNode from "./StartNode";
+import StartNode from "./start-node";
 import type { JSX } from "react";
-import InNode from "./InNode";
-import DataNode from "./DataNode";
+import InNode from "./in-node";
+import DataNode from "./data-node";
 import type { CustomNodeProps } from "../../model";
 
 const nodeTypes: Record<

@@ -7,7 +7,7 @@ import type {
   OnConnect,
   HandleType,
 } from "reactflow";
-import type { Edge as ScenarioBlockEdge } from "@/api-client/models/Edge";
+import type { Edge as ScenarioBlockEdge } from "@/shared/api-client/models/Edge";
 
 export type NewNodeProps = {
   id: string;

@@ -1,4 +1,4 @@
-import type { Edge, Node } from "@/api-client";
+import type { Edge, Node } from "@/shared/api-client";
 import type { BaseDraggableNode, NodeIO } from "@shared/types/nodes";
 import type { IconType } from "react-icons";
 import type { NodeProps } from "reactflow";
