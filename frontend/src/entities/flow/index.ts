@@ -6,7 +6,8 @@
  *
  * Public API:
  * - useFlowStore: Zustand store for flow state management
- * - Flow types (Node, Edge, Connection, etc.)
+ * - Flow types (Node, Edge, Connection, RFState, etc.)
+ * - Node configurations (nodes, nodesConfig, getNodeConfig, getNodeColor)
  */
 
 export * from "./model";

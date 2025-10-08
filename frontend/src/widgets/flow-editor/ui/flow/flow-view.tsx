@@ -1,10 +1,9 @@
 import ReactFlow, { MiniMap, Background } from "reactflow";
 import "reactflow/dist/style.css";
-import { useFlowStore } from "@/entities/flow";
+import { useFlowStore, getNodeColor } from "@/entities/flow";
 import { useState } from "react";
 import nodeTypes from "../nodes";
-import type { FlowViewProps } from "../../model";
-import { getNodeColor } from "../../model/configuration";
+import type { FlowViewProps } from "../../types";
 
 function FlowView(props: Readonly<FlowViewProps>) {
   const [isInitialRender, setIsInitialRender] = useState<boolean>(true);

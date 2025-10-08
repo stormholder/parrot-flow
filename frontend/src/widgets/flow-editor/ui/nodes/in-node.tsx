@@ -1,4 +1,4 @@
-import type { CustomNodeProps } from "../../model";
+import type { CustomNodeProps } from "../../types";
 import BaseNode from "./base-node";
 
 const InNode = ({ data }: CustomNodeProps) => {

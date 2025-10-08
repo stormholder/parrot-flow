@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import type {
   Connection,
-  Node,
-  Edge,
+  Node as RFNode,
+  Edge as RFEdge,
   NodeChange,
   EdgeChange,
   HandleType,
@@ -17,10 +17,10 @@ import {
 import type { NewEdgeProps, NewNodeProps, RFState } from "./types";
 import type { NodeTypes } from "@shared/types/nodes";
 import { nanoid } from "@/shared/lib/utils";
-import { getNodeConfig } from "@/widgets/flow-editor/model/nodes";
+import { getNodeConfig } from "./nodes";
 
-const initialNodes: Node[] = [];
-const initialEdges: Edge[] = [];
+const initialNodes: RFNode[] = [];
+const initialEdges: RFEdge[] = [];
 
 export const useFlowStore = create<RFState>()((set, get) => ({
   edgeUpdateSuccessful: true,
@@ -28,7 +28,7 @@ export const useFlowStore = create<RFState>()((set, get) => ({
   edges: initialEdges,
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onSelectionChange: (_params: { nodes: Node[]; edges: Edge[] }) => {
+  onSelectionChange: (_params: { nodes: RFNode[]; edges: RFEdge[] }) => {
     // console.log(params);
   },
 
@@ -48,7 +48,7 @@ export const useFlowStore = create<RFState>()((set, get) => ({
     if (!connection.source || !connection.target) {
       return;
     }
-    const newEdge: Edge = {
+    const newEdge: RFEdge = {
       id: nanoid(),
       source: connection.source,
       sourceHandle: connection.sourceHandle,
@@ -69,7 +69,7 @@ export const useFlowStore = create<RFState>()((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _event: React.MouseEvent,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _edge: Edge,
+    _edge: RFEdge,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _handle: HandleType
   ) => {
@@ -78,13 +78,13 @@ export const useFlowStore = create<RFState>()((set, get) => ({
 
   onEdgeUpdateEnd: (
     _event: React.MouseEvent,
-    edge: Edge,
+    edge: RFEdge,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _handle: HandleType
   ) => {
     if (!get().edgeUpdateSuccessful) {
       set({
-        edges: get().edges.filter((e: Edge) => e.id !== edge.id),
+        edges: get().edges.filter((e: RFEdge) => e.id !== edge.id),
       });
     }
     set({
@@ -92,7 +92,7 @@ export const useFlowStore = create<RFState>()((set, get) => ({
     });
   },
 
-  onEdgeUpdate: (oldEdge: Edge, newConnection: Connection) => {
+  onEdgeUpdate: (oldEdge: RFEdge, newConnection: Connection) => {
     set({
       edgeUpdateSuccessful: true,
     });
@@ -102,7 +102,7 @@ export const useFlowStore = create<RFState>()((set, get) => ({
   },
 
   appendNode: (nodeProps: NewNodeProps) => {
-    const newNode: Node = {
+    const newNode: RFNode = {
       id: nodeProps.id,
       type: nodeProps.type,
       position: nodeProps.position,
@@ -122,7 +122,7 @@ export const useFlowStore = create<RFState>()((set, get) => ({
     if (existingEdge) {
       return;
     }
-    const newEdge: Edge = {
+    const newEdge: RFEdge = {
       id: edgeProps.id,
       source: edgeProps.source,
       target: edgeProps.target,

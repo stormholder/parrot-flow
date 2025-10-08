@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import type { FlowProps } from "../../model";
-import { nodes as toolboxNodes } from "../../model/nodes";
-import useStore from "../../store";
+import type { FlowProps } from "../../types";
+import { useFlowStore, nodes as toolboxNodes, getNodeColor } from "@/entities/flow";
 import ReactFlow, {
   Background,
   MiniMap,
@@ -13,7 +12,6 @@ import ReactFlow, {
   type NodeChange,
 } from "reactflow";
 import CustomDndContext from "../dnd/custom-dnd-context";
-import { getNodeColor } from "../../model/configuration";
 import nodeTypes from "../nodes";
 import { isAppleOS } from "@/shared/lib/utils";
 
@@ -31,7 +29,7 @@ function FlowEditor(props: Readonly<FlowProps>) {
     onEdgeUpdateStart,
     onEdgeUpdate,
     onEdgeUpdateEnd,
-  } = useStore();
+  } = useFlowStore();
 
   const {
     nodes: propNodes,

@@ -10,8 +10,8 @@ import {
 } from "react-icons/tb";
 
 import type { DraggableNodeLabel, NodeTypes } from "@shared/types/nodes";
-import type { DraggableNode } from ".";
-import { nodesConfig } from "./configuration";
+import type { DraggableNode } from "./types";
+import { nodesConfig } from "./nodes-config";
 
 export const nodeColors: Record<DraggableNodeLabel, string> = {
   api: "rgb(239 197 118)",
@@ -89,4 +89,11 @@ export const getNodeConfig = (
     ...nodes[type],
     ...configGenerator(id, parameters),
   };
+};
+
+export const getNodeColor = (n: { type?: string; style?: { backgroundColor?: string } }): string => {
+  if (n.style?.backgroundColor) return n.style.backgroundColor;
+  if (!!n.type && n.type in nodes)
+    return nodes[n.type as NodeTypes].color!;
+  return "#e2e2e2";
 };

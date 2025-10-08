@@ -1,15 +1,9 @@
 import type { Edge, Node } from "@/shared/api-client";
-import type { BaseDraggableNode, NodeIO } from "@shared/types/nodes";
-import type { IconType } from "react-icons";
 import type { NodeProps } from "reactflow";
+import type { DraggableNode, IONodeProps } from "@/entities/flow";
+import type { IconType } from "react-icons";
 
-export type DraggableNode = BaseDraggableNode & { icon: IconType };
-
-export interface IONodeProps {
-  inputs?: NodeIO[];
-  outputs?: NodeIO[];
-}
-
+// Widget-specific types for flow-editor
 export type CustomNodeProps = NodeProps<IONodeProps & DraggableNode>;
 
 export interface BaseNodeProps {

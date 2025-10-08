@@ -1,8 +1,6 @@
 import type { NodeTypes } from "@shared/types/nodes";
-import type { DraggableNode, IONodeProps } from ".";
+import type { IONodeProps } from "./types";
 import { capitalize } from "@/shared/lib/utils";
-import { nodes as toolboxNodes } from "./nodes";
-import type { Node as RFNode } from "reactflow";
 
 export const nodesConfig: Record<
   NodeTypes,
@@ -132,11 +130,4 @@ export const nodesConfig: Record<
       },
     ],
   }),
-};
-
-export const getNodeColor = (n: RFNode<DraggableNode>): string => {
-  if (n.style?.backgroundColor) return n.style?.backgroundColor;
-  if (!!n.type && n.type in toolboxNodes)
-    return toolboxNodes[n.type as NodeTypes].color!;
-  return "#e2e2e2";
 };

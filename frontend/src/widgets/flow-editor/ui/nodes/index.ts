@@ -3,7 +3,7 @@ import StartNode from "./start-node";
 import type { JSX } from "react";
 import InNode from "./in-node";
 import DataNode from "./data-node";
-import type { CustomNodeProps } from "../../model";
+import type { CustomNodeProps } from "../../types";
 
 const nodeTypes: Record<
   NodeTypes | "start",
