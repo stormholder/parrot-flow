@@ -16,7 +16,7 @@ import {
 } from "reactflow";
 import type { NewEdgeProps, NewNodeProps, RFState } from "./types";
 import type { NodeTypes } from "@shared/types/nodes";
-import { nanoid } from "@/utils";
+import { nanoid } from "@/shared/lib/utils";
 import { getNodeConfig } from "../model/nodes";
 
 const initialNodes: Node[] = [];

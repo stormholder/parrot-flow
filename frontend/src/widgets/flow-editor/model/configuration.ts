@@ -1,6 +1,6 @@
 import type { NodeTypes } from "@shared/types/nodes";
 import type { DraggableNode, IONodeProps } from ".";
-import { capitalize } from "@/utils";
+import { capitalize } from "@/shared/lib/utils";
 import { nodes as toolboxNodes } from "./nodes";
 import type { Node as RFNode } from "reactflow";
 

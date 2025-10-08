@@ -15,7 +15,7 @@ import ReactFlow, {
 import CustomDndContext from "../dnd/custom-dnd-context";
 import { getNodeColor } from "../../model/configuration";
 import nodeTypes from "../nodes";
-import { isAppleOS } from "@/utils";
+import { isAppleOS } from "@/shared/lib/utils";
 
 function FlowEditor(props: Readonly<FlowProps>) {
   const {

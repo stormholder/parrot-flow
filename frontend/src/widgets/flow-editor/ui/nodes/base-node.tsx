@@ -6,7 +6,7 @@ import type {
   BaseNodeParamProps,
   BaseNodeProps,
 } from "../../model";
-import { clsx } from "@/utils";
+import { clsx } from "@/shared/lib/utils";
 
 const BaseNode = ({
   label,

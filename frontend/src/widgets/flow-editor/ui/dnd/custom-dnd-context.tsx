@@ -1,7 +1,7 @@
 import { useCallback, useId } from "react";
 import { useReactFlow } from "reactflow";
 import { DndContext, type DragEndEvent } from "@dnd-kit/core";
-import { nanoid } from "@/utils";
+import { nanoid } from "@/shared/lib/utils";
 import { getNodeConfig } from "../../model/nodes";
 import CustomDragOverlay from "./custom-drag-overlay";
 
