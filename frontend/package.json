@@ -26,7 +26,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "apigen": "openapi -i ../shared/schemas/document.yaml -c axios -o ./src/api-client/ --indent 2",
+    "apigen": "openapi -i ../shared/schemas/document.yaml -c axios -o ./src/shared/api-client/ --indent 2",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
