@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { Outlet } from "react-router-dom";
 
 import { Navigation } from "@/widgets/navigation/Navigation";
-import routes from "@/routes/root";
+import routes from "@/app/router/root";
 
 export const RootPage: FC = () => {
   return (
