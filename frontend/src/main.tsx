@@ -1,13 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-
-import App from "./App.tsx";
-import { HeroUIProvider } from "@heroui/react";
+import App from "@/app";
+import "@/app/styles/global.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <HeroUIProvider>
-      <App />
-    </HeroUIProvider>
+    <App />
   </StrictMode>
 );

@@ -1,10 +1,10 @@
 export async function scenarioListLoader({ request }: { request: Request }): Promise<any> {
   const url = new URL(request.url);
-  const queryName = url.searchParams.get('name');
+  const _queryName = url.searchParams.get('name');
   const rawTags = url.searchParams.get('tag');
-  let tags: string[] | undefined = undefined;
+  let _tags: string[] | undefined = undefined;
   if (!!rawTags) {
-    tags = rawTags.split(',');
+    _tags = rawTags.split(',');
   }
   return {}
 //   const query: ScenarioQuery = { name: queryName || undefined, tag: tags }
@@ -27,7 +27,7 @@ export async function scenarioListLoader({ request }: { request: Request }): Pro
 //   }
 }
 
-export async function scenarioItemLoader({ params }: { params: any }): Promise<any> {
+export async function scenarioItemLoader({ params: _params }: { params: any }): Promise<any> {
   return {}
   // const response = await getScenario(params.scenarioId);
   // if (!response) {
