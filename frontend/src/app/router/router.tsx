@@ -1,12 +1,12 @@
-import { RootPage } from "@/pages/RootPage/root.page";
+import { RootPage } from "@/pages/root";
 import { createBrowserRouter } from "react-router-dom";
 
-import ErrorPage from "@/pages/ErrorPage/error.page";
-import DashboardPage from "@/pages/Dashboard/dashboard.page";
-import { ScenarioItemLoader, ScenarioListLoader } from "@/pages/Scenario/query";
-import ScenarioListPage from "@/pages/Scenario/pages/list.page";
-import ScenarioItemPage from "@/pages/Scenario/pages/item.page";
-import ScenarioFlowPage from "@/pages/Scenario/pages/flow.page";
+import { ErrorPage } from "@/pages/error";
+import { DashboardPage } from "@/pages/dashboard";
+import { scenarioItemLoader, scenarioListLoader } from "@/entities/scenario";
+import { ScenarioListPage } from "@/pages/scenario-list";
+import { ScenarioItemPage } from "@/pages/scenario-item";
+import { ScenarioFlowPage } from "@/pages/scenario-flow";
 
 export const router = createBrowserRouter([
   {
@@ -20,17 +20,17 @@ export const router = createBrowserRouter([
       },
       {
         path: "scenarios",
-        loader: ScenarioListLoader,
+        loader: scenarioListLoader,
         element: <ScenarioListPage />,
       },
       {
         path: "scenarios/:scenarioId",
-        loader: ScenarioItemLoader,
+        loader: scenarioItemLoader,
         element: <ScenarioItemPage />,
       },
       {
         path: "scenarios/:scenarioId/flow",
-        loader: ScenarioItemLoader,
+        loader: scenarioItemLoader,
         element: <ScenarioFlowPage />,
       },
     ],

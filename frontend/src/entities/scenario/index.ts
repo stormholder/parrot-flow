@@ -10,4 +10,5 @@
  */
 
 export { scenarioApi } from "./api/scenario-api";
+export { scenarioListLoader, scenarioItemLoader } from "./api/loaders";
 export * from "./model";
