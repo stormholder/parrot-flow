@@ -1,26 +1,118 @@
 components:
   schemas:
-    Edge:
+    CreateRunRequestBody:
       additionalProperties: false
       properties:
-        condition:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateRunRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        parameters:
+          type: string
+        scenario_id:
+          type: string
+      required:
+        - scenario_id
+        - parameters
+      type: object
+    CreateRunResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateRunResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        created_at:
           type: string
         id:
           type: string
-        source:
+        parameters:
           type: string
-        sourceHandle:
+        scenario_id:
           type: string
-        target:
-          type: string
-        targetHandle:
+        status:
           type: string
       required:
         - id
-        - source
-        - target
-        - sourceHandle
-        - targetHandle
+        - scenario_id
+        - status
+        - parameters
+        - created_at
+      type: object
+    CreateScenarioRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateScenarioRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        name:
+          type: string
+        tag:
+          type: string
+      required:
+        - name
+      type: object
+    CreateScenarioResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateScenarioResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        tag:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - name
+        - description
+        - tag
+        - icon
+        - created_at
+        - updated_at
+      type: object
+    DeleteScenarioResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteScenarioResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        success:
+          type: boolean
+      required:
+        - success
       type: object
     ErrorDetail:
       additionalProperties: false
@@ -81,6 +173,40 @@ components:
           format: uri
           type: string
       type: object
+    GetRunResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetRunResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        created_at:
+          type: string
+        finished_at:
+          type: string
+        id:
+          type: string
+        parameters:
+          type: string
+        scenario_id:
+          type: string
+        started_at:
+          type: string
+        status:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - scenario_id
+        - status
+        - parameters
+        - created_at
+        - updated_at
+      type: object
     GreetingOutputBody:
       additionalProperties: false
       properties:
@@ -99,120 +225,23 @@ components:
       required:
         - message
       type: object
-    Node:
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-        position:
-          $ref: "#/components/schemas/Point2D"
-        type:
-          type: string
-      required:
-        - id
-        - type
-        - position
-      type: object
-    Point2D:
-      additionalProperties: false
-      properties:
-        x:
-          format: float
-          type: number
-        "y":
-          format: float
-          type: number
-      required:
-        - x
-        - "y"
-      type: object
-    ScenarioBlockParameter:
-      additionalProperties: false
-      properties:
-        name:
-          type: string
-        value: {}
-      required:
-        - name
-        - value
-      type: object
-    ScenarioContext:
-      additionalProperties: false
-      properties:
-        blocks:
-          items:
-            $ref: "#/components/schemas/Node"
-          type:
-            - array
-            - "null"
-        edges:
-          items:
-            $ref: "#/components/schemas/Edge"
-          type:
-            - array
-            - "null"
-      required:
-        - blocks
-        - edges
-      type: object
-    ScenarioCreateResponseBody:
+    ListRunsResponseBody:
       additionalProperties: false
       properties:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ScenarioCreateResponseBody.json
+            - https://example.com/schemas/ListRunsResponseBody.json
           format: uri
           readOnly: true
           type: string
-        context:
-          type: string
-        created_at:
-          format: date-time
-          type: string
-        description:
-          type: string
-        icon:
-          type: string
-        id:
-          format: int64
-          minimum: 0
-          type: integer
-        input_data:
-          type: string
-        name:
-          type: string
-        parameters:
-          type: string
-        tag:
-          type: string
-        updated_at:
-          format: date-time
-          type: string
-      required:
-        - context
-        - input_data
-        - parameters
-        - name
-        - id
-        - created_at
-        - updated_at
-      type: object
-    ScenarioListResponseBody:
-      additionalProperties: false
-      properties:
-        $schema:
-          description: A URL to the JSON Schema for this object.
-          examples:
-            - https://example.com/schemas/ScenarioListResponseBody.json
-          format: uri
-          readOnly: true
-          type: string
-        data: {}
+        data:
+          items:
+            $ref: "#/components/schemas/RunListItem"
+          type:
+            - array
+            - "null"
         page:
-          format: int64
-          type: integer
-        pages:
           format: int64
           type: integer
         rpp:
@@ -222,93 +251,167 @@ components:
           format: int64
           type: integer
       required:
-        - total
-        - pages
-        - rpp
-        - page
         - data
+        - total
+        - page
+        - rpp
       type: object
-    ScenarioNodeParameters:
-      additionalProperties: false
-      properties:
-        blockId:
-          type: string
-        input:
-          items:
-            $ref: "#/components/schemas/ScenarioBlockParameter"
-          type:
-            - array
-            - "null"
-        output:
-          items:
-            $ref: "#/components/schemas/ScenarioBlockParameter"
-          type:
-            - array
-            - "null"
-      required:
-        - blockId
-        - input
-        - output
-      type: object
-    ScenarioPatchRequestBody:
+    ListScenariosResponseBody:
       additionalProperties: false
       properties:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ScenarioPatchRequestBody.json
+            - https://example.com/schemas/ListScenariosResponseBody.json
           format: uri
           readOnly: true
           type: string
-        context:
-          $ref: "#/components/schemas/ScenarioContext"
-        description:
+        data:
+          items:
+            $ref: "#/components/schemas/ScenarioResponseItem"
+          type:
+            - array
+            - "null"
+        page:
+          format: int64
+          type: integer
+        rpp:
+          format: int64
+          type: integer
+        total:
+          format: int64
+          type: integer
+      required:
+        - data
+        - total
+        - page
+        - rpp
+      type: object
+    RunListItem:
+      additionalProperties: false
+      properties:
+        created_at:
           type: string
-        icon:
+        finished_at:
           type: string
-        input_data: {}
-        name:
+        id:
           type: string
         parameters:
-          $ref: "#/components/schemas/ScenarioNodeParameters"
-        tag:
           type: string
+        scenario_id:
+          type: string
+        started_at:
+          type: string
+        status:
+          type: string
+      required:
+        - id
+        - scenario_id
+        - status
+        - parameters
+        - created_at
       type: object
-    ScenarioResponseBody:
+    ScenarioResponseItem:
       additionalProperties: false
       properties:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ScenarioResponseBody.json
+            - https://example.com/schemas/ScenarioResponseItem.json
           format: uri
           readOnly: true
           type: string
-        context:
-          $ref: "#/components/schemas/ScenarioContext"
         created_at:
-          format: date-time
           type: string
         description:
           type: string
         icon:
           type: string
         id:
-          format: int64
-          minimum: 0
-          type: integer
+          type: string
         name:
           type: string
         tag:
           type: string
         updated_at:
-          format: date-time
           type: string
       required:
-        - context
-        - name
         - id
+        - name
+        - description
+        - tag
+        - icon
         - created_at
+        - updated_at
+      type: object
+    StartRunResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/StartRunResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          type: string
+        started_at:
+          type: string
+        status:
+          type: string
+      required:
+        - id
+        - status
+        - started_at
+      type: object
+    UpdateScenarioRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateScenarioRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        name:
+          type: string
+        tag:
+          type: string
+      type: object
+    UpdateScenarioResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateScenarioResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        tag:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - name
+        - description
+        - tag
+        - icon
         - updated_at
       type: object
 info:
@@ -318,6 +421,7 @@ openapi: 3.1.0
 paths:
   /:
     get:
+      description: Root endpoint for the Parrot Flow API
       operationId: root
       responses:
         "200":
@@ -335,25 +439,21 @@ paths:
       summary: Root
       tags:
         - system
-  /api/scenarios/:
+  /api/runs:
     get:
-      description: Get a list of scenarios by criteria
-      operationId: get-scenarios
+      description: Get a list of runs with optional filtering
+      operationId: list-runs
       parameters:
         - explode: false
           in: query
-          name: name
+          name: scenario_id
           schema:
             type: string
         - explode: false
           in: query
-          name: tags
+          name: status
           schema:
-            items:
-              type: string
-            type:
-              - array
-              - "null"
+            type: string
         - explode: false
           in: query
           name: page
@@ -366,22 +466,12 @@ paths:
           schema:
             format: int64
             type: integer
-        - explode: false
-          in: query
-          name: order
-          schema:
-            type: string
-        - explode: false
-          in: query
-          name: dir
-          schema:
-            type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ScenarioListResponseBody"
+                $ref: "#/components/schemas/ListRunsResponseBody"
           description: OK
         default:
           content:
@@ -389,69 +479,170 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
-      summary: Get scenarios
+      summary: List runs
       tags:
-        - Scenario
+        - ScenarioRun
     post:
-      description: Create an empty new scenario
-      operationId: create-scenario
+      description: Create a new scenario run
+      operationId: create-run
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRunRequestBody"
+        required: true
       responses:
-        "201":
+        "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ScenarioCreateResponseBody"
-          description: Created
+                $ref: "#/components/schemas/CreateRunResponseBody"
+          description: OK
         default:
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
-      summary: Create new scenario
+      summary: Create a new run
       tags:
-        - Scenario
+        - ScenarioRun
+  /api/runs/{id}:
+    get:
+      description: Retrieve a specific run by its ID
+      operationId: get-run
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetRunResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a run by ID
+      tags:
+        - ScenarioRun
+  /api/runs/{id}/start:
+    post:
+      description: Start execution of a run
+      operationId: start-run
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartRunResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Start a run
+      tags:
+        - ScenarioRun
+  /api/scenarios/:
+    get:
+      description: Get a list of scenarios with optional filtering
+      operationId: list-scenarios
+      parameters:
+        - explode: false
+          in: query
+          name: name
+          schema:
+            type: string
+        - explode: false
+          in: query
+          name: tag
+          schema:
+            type: string
+        - explode: false
+          in: query
+          name: page
+          schema:
+            format: int64
+            type: integer
+        - explode: false
+          in: query
+          name: rpp
+          schema:
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListScenariosResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List scenarios
+      tags:
+        - scenarios
+    post:
+      description: Create a new browser automation scenario
+      operationId: create-scenario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateScenarioRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateScenarioResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Create a new scenario
+      tags:
+        - scenarios
   /api/scenarios/{id}:
     delete:
-      description: Delete a specific scenario by ID
+      description: Delete a scenario by its ID
       operationId: delete-scenario
       parameters:
         - in: path
           name: id
           required: true
           schema:
-            format: int64
-            minimum: 0
-            type: integer
-      responses:
-        "204":
-          description: No Content
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Delete a specific scenario
-      tags:
-        - Scenario
-    get:
-      description: Get a specific scenario by ID
-      operationId: get-scenario
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            format: int64
-            minimum: 0
-            type: integer
+            type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ScenarioResponseBody"
+                $ref: "#/components/schemas/DeleteScenarioResponseBody"
           description: OK
         default:
           content:
@@ -459,68 +650,82 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
-      summary: Get a specific scenario
+      summary: Delete a scenario
       tags:
-        - Scenario
-    patch:
-      description: Update a specific scenario by ID
-      operationId: update-scenario
+        - scenarios
+    get:
+      description: Retrieve a specific scenario by its ID
+      operationId: get-scenario
       parameters:
         - in: path
           name: id
           required: true
           schema:
-            format: int64
-            minimum: 0
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ScenarioPatchRequestBody"
-        required: true
+            type: string
       responses:
-        "204":
-          description: No Content
-          headers:
-            Context:
+        "200":
+          content:
+            application/json:
               schema:
-                type: string
-            CreatedAt:
-              schema:
-                type: string
-            Description:
-              schema:
-                type: string
-            ID:
-              schema:
-                format: int64
-                minimum: 0
-                type: integer
-            Icon:
-              schema:
-                type: string
-            InputData:
-              schema:
-                type: string
-            Name:
-              schema:
-                type: string
-            Parameters:
-              schema:
-                type: string
-            Tag:
-              schema:
-                type: string
-            UpdatedAt:
-              schema:
-                type: string
+                $ref: "#/components/schemas/ScenarioResponseItem"
+          description: OK
         default:
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
-      summary: Update a specific scenario
+      summary: Get a scenario by ID
       tags:
-        - Scenario
+        - scenarios
+    patch:
+      description: Update an existing scenario
+      operationId: update-scenario
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateScenarioRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateScenarioResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update a scenario
+      tags:
+        - scenarios
+  /health:
+    get:
+      description: Check the health status of the API
+      operationId: health
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GreetingOutputBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Health Check
+      tags:
+        - system
