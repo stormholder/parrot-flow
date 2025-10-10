@@ -1,9 +1,9 @@
-import { ScenarioService } from "@/shared/api-client";
+import { ScenariosService } from "@/shared/api-client";
 import type {
-  ScenarioResponseBody,
-  ScenarioListResponseBody,
-  ScenarioPatchRequestBody,
-  ScenarioCreateResponseBody,
+  ScenarioResponseItem,
+  ListScenariosResponseBody,
+  UpdateScenarioRequestBody,
+  CreateScenarioResponseBody,
 } from "@/shared/api-client";
 
 export const scenarioApi = {
@@ -14,33 +14,35 @@ export const scenarioApi = {
     rpp?: number;
     order?: string;
     dir?: string;
-  }): Promise<ScenarioListResponseBody> {
-    const response = await ScenarioService.getScenarios(
+  }): Promise<ListScenariosResponseBody> {
+    const response = await ScenariosService.listScenarios(
       filters?.name,
-      filters?.tags,
+      undefined, // filters?.tag,
       filters?.page,
-      filters?.rpp,
-      filters?.order,
-      filters?.dir
+      filters?.rpp
+      // filters?.order,
+      // filters?.dir
     );
-    return response as ScenarioListResponseBody;
+    return response as ListScenariosResponseBody;
   },
 
-  async getById(id: number): Promise<ScenarioResponseBody> {
-    const response = await ScenarioService.getScenario(id);
-    return response as ScenarioResponseBody;
+  async getById(id: string): Promise<ScenarioResponseItem> {
+    const response = await ScenariosService.getScenario(id);
+    return response as ScenarioResponseItem;
   },
 
-  async create(): Promise<ScenarioCreateResponseBody> {
-    const response = await ScenarioService.createScenario();
-    return response as ScenarioCreateResponseBody;
+  async create(name: string): Promise<CreateScenarioResponseBody> {
+    const response = await ScenariosService.createScenario({
+      name,
+    });
+    return response as CreateScenarioResponseBody;
   },
 
-  async update(id: number, data: ScenarioPatchRequestBody): Promise<void> {
-    await ScenarioService.updateScenario(id, data);
+  async update(id: string, data: UpdateScenarioRequestBody): Promise<void> {
+    await ScenariosService.updateScenario(id, data);
   },
 
-  async delete(id: number): Promise<void> {
-    await ScenarioService.deleteScenario(id);
+  async delete(id: string): Promise<void> {
+    await ScenariosService.deleteScenario(id);
   },
 };

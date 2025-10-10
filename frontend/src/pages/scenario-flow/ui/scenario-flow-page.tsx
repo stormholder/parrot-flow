@@ -1,12 +1,15 @@
-import { scenario } from "@/../mock/scenario.mock";
+import { useLoaderData } from "react-router-dom";
+import type { ScenarioItemLoaderData } from "@/entities/scenario";
 import FlowEditor from "@/widgets/flow-editor/ui/flow/flow-editor";
 
 const ScenarioFlowPage = () => {
+  const { flow } = useLoaderData() as ScenarioItemLoaderData;
+
   return (
     <div className="w-full relative overflow-x-hidden">
       <FlowEditor
-        nodes={scenario.blocks}
-        edges={scenario.edges}
+        nodes={flow.blocks}
+        edges={flow.edges}
         showAside={false}
       />
     </div>
