@@ -23,7 +23,12 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --import tsx --test 'test/**/*.test.ts'",
+    "test:watch": "node --import tsx --test --watch 'test/**/*.test.ts'",
+    "test:examples": "tsx test/graph/example.ts",
+    "generate:types": "ts-node scripts/generate-types.ts",
+    "dev": "nodemon --watch src --ext ts --exec ts-node index.ts",
+    "build": "esbuild index.ts --bundle --platform=node --target=node18 --outfile=dist/index.js"
   },
   "dependencies": {
     "@playwright/browser-chromium": "^1.55.0",
@@ -37,12 +42,17 @@
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.7",
+    "@types/js-yaml": "^4.0.9",
     "@types/mocha": "^10.0.10",
     "@types/nanoid": "^2.1.0",
     "@types/node": "^24.5.1",
     "esbuild": "^0.25.9",
+    "js-yaml": "^4.1.0",
+    "json-schema-to-typescript": "^15.0.4",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.2"
   }
 }
