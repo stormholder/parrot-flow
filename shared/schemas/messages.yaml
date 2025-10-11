@@ -1,0 +1,425 @@
+# Message Contracts for RabbitMQ communication between Backend and Agent
+# This schema aligns with backend domain entities and value objects
+# Domain: backend/internal/domain/scenario/value_objects.go
+
+components:
+  schemas:
+    # ==================== Core Domain Types (aligned with backend) ====================
+
+    Point2D:
+      type: object
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: number
+          description: X coordinate in the flow editor
+        y:
+          type: number
+          description: Y coordinate in the flow editor
+
+    Node:
+      type: object
+      required:
+        - id
+        - node_type
+        - position
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the node
+        node_type:
+          type: string
+          enum:
+            - start
+            - goto
+            - waitduration
+            - findelement
+            - click
+            - inputdata
+            - keypress
+            - screenshot
+            - loaddata
+            - extractdata
+          description: Type of browser action to perform (maps to NodeType in backend)
+        position:
+          $ref: "#/components/schemas/Point2D"
+
+    Edge:
+      type: object
+      required:
+        - id
+        - source
+        - target
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the edge
+        source:
+          type: string
+          description: ID of the source node
+        target:
+          type: string
+          description: ID of the target node
+        source_handle:
+          type: string
+          description: Handle ID on source node (for data passing)
+        target_handle:
+          type: string
+          description: Handle ID on target node (for data receiving)
+        condition:
+          type: string
+          description: Condition for edge traversal (for conditional flows)
+
+    Context:
+      type: object
+      required:
+        - blocks
+        - edges
+      properties:
+        blocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Node"
+          description: List of all nodes in the scenario (Context.Blocks in backend)
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/Edge"
+          description: List of all connections between nodes (Context.Edges in backend)
+
+    # ==================== Node Parameters (aligned with backend InputData) ====================
+
+    Parameter:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          description: Parameter name (e.g., 'selector', 'url', 'timeout')
+        value:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: "null"
+          description: Parameter value (can reference variables or be literal)
+
+    NodeParameters:
+      type: object
+      required:
+        - block_id
+        - input
+      properties:
+        block_id:
+          type: string
+          description: ID of the node this configuration belongs to
+        input:
+          type: array
+          items:
+            $ref: "#/components/schemas/Parameter"
+          description: Input parameters for this node
+        output:
+          type: array
+          items:
+            $ref: "#/components/schemas/Parameter"
+          description: Output parameters from node execution (populated by agent)
+
+    InputData:
+      type: object
+      required:
+        - parameters
+      properties:
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/NodeParameters"
+          description: Parameters for each node in the scenario (maps to InputData in backend)
+
+    # ==================== Scenario Parameters (aligned with backend Parameters) ====================
+
+    ParameterItem:
+      type: object
+      required:
+        - parameter
+        - param_type
+      properties:
+        parameter:
+          $ref: "#/components/schemas/Parameter"
+          description: The parameter itself (name and value)
+        param_type:
+          type: string
+          enum:
+            - string
+            - number
+            - boolean
+          description: Expected type of the parameter (maps to ParamType in backend)
+        values:
+          type: array
+          items:
+            type: string
+          description: Allowed values (for enum-like params)
+
+    Parameters:
+      type: object
+      required:
+        - input
+        - output
+      properties:
+        input:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParameterItem"
+          description: Input parameters provided at runtime (scenario-level)
+        output:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParameterItem"
+          description: Output parameters to be extracted (scenario-level)
+
+    # ==================== Browser Configuration ====================
+
+    Viewport:
+      type: object
+      properties:
+        width:
+          type: integer
+          minimum: 320
+          maximum: 3840
+          default: 1920
+        height:
+          type: integer
+          minimum: 240
+          maximum: 2160
+          default: 1080
+        deviceScaleFactor:
+          type: number
+          minimum: 0.1
+          maximum: 5
+          default: 1
+
+    BrowserConfig:
+      type: object
+      properties:
+        headless:
+          type: boolean
+          default: true
+          description: Run browser in headless mode
+        viewport:
+          $ref: "#/components/schemas/Viewport"
+        userAgent:
+          type: string
+          description: Custom user agent string
+        timeout:
+          type: integer
+          minimum: 1000
+          maximum: 300000
+          default: 30000
+          description: Default timeout for actions in milliseconds
+        locale:
+          type: string
+          default: "en-US"
+          description: Browser locale
+        timezone:
+          type: string
+          default: "America/New_York"
+          description: Browser timezone
+
+    # ==================== Agent Messages ====================
+
+    ExecuteScenarioMessage:
+      type: object
+      required:
+        - run_id
+        - scenario_id
+        - context
+        - input_data
+        - parameters
+      properties:
+        run_id:
+          type: string
+          format: uuid
+          description: Unique identifier for this scenario run (Run.Id in backend)
+        scenario_id:
+          type: string
+          description: ID of the scenario being executed (Scenario.Id in backend)
+        context:
+          $ref: "#/components/schemas/Context"
+          description: The scenario context (graph structure) to execute
+        input_data:
+          $ref: "#/components/schemas/InputData"
+          description: Input parameters for each node in the scenario
+        parameters:
+          $ref: "#/components/schemas/Parameters"
+          description: Scenario-level runtime parameters
+        browser_config:
+          $ref: "#/components/schemas/BrowserConfig"
+          description: Browser configuration (agent-specific, not in domain)
+        control_queue:
+          type: string
+          description: RabbitMQ queue name for control commands (pause/cancel)
+        reply_queue:
+          type: string
+          description: RabbitMQ queue name for progress updates
+
+    # ==================== Progress Updates (aligned with Run states) ====================
+
+    ProgressEvent:
+      type: object
+      required:
+        - run_id
+        - event
+        - timestamp
+      properties:
+        run_id:
+          type: string
+          format: uuid
+          description: ID of the run this event belongs to (Run.Id in backend)
+        event:
+          type: string
+          enum:
+            - run_started      # Maps to Run.Start()
+            - node_started     # Block/node execution started
+            - node_completed   # Block/node execution completed successfully
+            - node_failed      # Block/node execution failed
+            - run_completed    # Maps to Run.Complete()
+            - run_failed       # Maps to Run.Fail()
+            - run_paused       # Run paused (for future implementation)
+            - run_resumed      # Run resumed (for future implementation)
+            - run_cancelled    # Maps to Run.Cancel()
+          description: Type of progress event (aligns with Run state transitions)
+        node_id:
+          type: string
+          description: ID of node (for node-level events)
+        data:
+          type: object
+          description: Event-specific data (node output, error details, etc.)
+          additionalProperties: true
+        error:
+          type: string
+          description: Error message (for failed events)
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of the event
+        execution_time_ms:
+          type: integer
+          description: Time taken for node execution (for completed events)
+
+    # ==================== Control Commands ====================
+
+    ControlCommand:
+      type: object
+      required:
+        - run_id
+        - command
+        - timestamp
+      properties:
+        run_id:
+          type: string
+          format: uuid
+          description: ID of the run to control
+        command:
+          type: string
+          enum:
+            - pause
+            - resume
+            - cancel
+          description: Control action to perform
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of the command
+
+    # ==================== Agent Heartbeat ====================
+
+    AgentHeartbeat:
+      type: object
+      required:
+        - agent_id
+        - status
+        - timestamp
+      properties:
+        agent_id:
+          type: string
+          description: Unique identifier for the agent instance
+        status:
+          type: string
+          enum:
+            - idle
+            - running
+            - error
+          description: Current agent status
+        current_run_id:
+          type: string
+          format: uuid
+          description: ID of currently executing run (if any)
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp
+        metadata:
+          type: object
+          description: Additional agent metadata (version, capabilities, etc.)
+          additionalProperties: true
+
+# ==================== Message Queue Names ====================
+# Document the queue structure for reference
+# These queues facilitate communication between Backend and Agent
+
+queues:
+  agent_requests:
+    name: "agent.requests"
+    description: "Backend sends ExecuteScenarioMessage here to request scenario execution"
+    message_type: ExecuteScenarioMessage
+    producer: Backend
+    consumer: Agent
+
+  agent_progress:
+    name: "agent.progress.{run_id}"
+    description: "Agent sends ProgressEvent updates here (per-run queue specified in reply_queue)"
+    message_type: ProgressEvent
+    producer: Agent
+    consumer: Backend
+
+  agent_control:
+    name: "agent.control.{run_id}"
+    description: "Backend sends ControlCommand here for run control (per-run queue)"
+    message_type: ControlCommand
+    producer: Backend
+    consumer: Agent
+
+  agent_heartbeat:
+    name: "agent.heartbeat"
+    description: "Agent sends periodic heartbeats to indicate availability"
+    message_type: AgentHeartbeat
+    producer: Agent
+    consumer: Backend
+
+# ==================== Alignment with Backend Domain ====================
+# This schema is aligned with:
+#
+# Domain Entities:
+# - backend/internal/domain/scenario/entity.go (Scenario)
+# - backend/internal/domain/run/entity.go (Run)
+#
+# Value Objects:
+# - backend/internal/domain/scenario/value_objects.go
+#   - Context (blocks/edges)
+#   - Node (id, node_type, position)
+#   - Edge (id, source, target, handles, condition)
+#   - InputData (node parameters)
+#   - Parameters (scenario-level parameters)
+#   - Parameter (name/value pair)
+#   - ParameterItem (parameter with type and validation)
+#
+# - backend/internal/domain/shared/value_objects.go
+#   - Status (PENDING, RUNNING, COMPLETED, FAILED, CANCELLED)
+#
+# Key Differences from Backend:
+# - BrowserConfig is agent-specific (not part of domain)
+# - Message contracts use snake_case for JSON serialization
+# - Agent-specific queuing metadata (control_queue, reply_queue)
