@@ -38,3 +38,4 @@ backend/store.db
 # MacOS
 .DS_Store
 agent/src/types/generated/
+agent/dist/tsconfig.tsbuildinfo
