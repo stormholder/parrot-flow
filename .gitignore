@@ -39,3 +39,30 @@ backend/store.db
 .DS_Store
 agent/src/types/generated/
 agent/dist
+
+# SSL Certificates (NEVER commit private keys!)
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+nginx/ssl/
+nginx/certs/
+
+# Docker volumes
+postgres_data/
+rabbitmq_data/
+
+# Backup files
+backups/
+*.sql.gz
+*.backup
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
