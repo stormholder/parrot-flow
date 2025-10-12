@@ -1,0 +1,27 @@
+# Development Dockerfile for Go backend with hot-reload
+
+FROM golang:1.25-alpine
+
+# Install development tools
+RUN apk add --no-cache git ca-certificates tzdata
+
+# Install Air for hot-reload (optional - can use go run)
+# RUN go install github.com/cosmtrek/air@latest
+
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code (will be overridden by volume mount in dev)
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Run with go run for hot-reload
+# Note: In dev mode, volumes will override this code
+CMD ["go", "run", "./cmd/parrotflow"]

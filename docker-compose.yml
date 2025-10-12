@@ -1,0 +1,147 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: parrotflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-parrotflow}
+      POSTGRES_USER: ${POSTGRES_USER:-parrotflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-parrotflow_dev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - parrotflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-parrotflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: parrotflow-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-parrotflow}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-parrotflow_dev}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    networks:
+      - parrotflow-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Go)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: parrotflow-backend
+    restart: unless-stopped
+    environment:
+      # Database
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-parrotflow}
+      DB_USER: ${POSTGRES_USER:-parrotflow}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-parrotflow_dev}
+      DB_SSL_MODE: disable
+
+      # RabbitMQ
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-parrotflow}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-parrotflow_dev}
+
+      # Server
+      SERVER_PORT: ${BACKEND_PORT:-3000}
+      SERVER_HOST: 0.0.0.0
+
+      # Environment
+      ENV: ${ENV:-production}
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    networks:
+      - parrotflow-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Agent Service (Node.js + Playwright)
+  agent:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    container_name: parrotflow-agent
+    restart: unless-stopped
+    environment:
+      # RabbitMQ
+      MQ_QUEUE_URL: amqp://${RABBITMQ_USER:-parrotflow}:${RABBITMQ_PASSWORD:-parrotflow_dev}@rabbitmq:5672
+      MQ_HEARTBEAT_URL: agent.heartbeat
+      MQ_REQUEST_URL: agent.requests
+
+      # Browser
+      BROWSER_PATH: /ms-playwright/chromium-*/chrome-linux/chrome
+      BROWSER_TYPE: chromium
+
+      # Environment
+      NODE_ENV: ${ENV:-production}
+    networks:
+      - parrotflow-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    # Agent needs extra capabilities for Chromium
+    cap_add:
+      - SYS_ADMIN
+    # Shared memory size for Chromium
+    shm_size: 2gb
+
+  # Nginx Reverse Proxy (includes frontend static files)
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
+    container_name: parrotflow-nginx
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    networks:
+      - parrotflow-network
+    depends_on:
+      - backend
+    volumes:
+      # Mount SSL certificates for HTTPS
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+
+networks:
+  parrotflow-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
