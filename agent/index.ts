@@ -1,58 +1,71 @@
-// import amqp from 'amqplib/callback_api'
-import amqp from 'amqplib'
+/**
+ * Agent Service Bootstrap
+ *
+ * Thin entry point that wires up dependencies and starts the agent.
+ * All business logic is delegated to the application layer.
+ */
+
 import { applicationConfig } from 'configuration.js';
-import { exit } from 'process';
+import { RabbitMQAdapter, HeartbeatMonitor } from './src/adapters/index.js';
+import { AgentService, AgentLifecycle } from './src/application/index.js';
 
-const createChannelAsync = async (url: string): Promise<amqp.Channel | null> => {
-    try {
-        const connection: amqp.ChannelModel = await amqp.connect(url);
-        const channel: amqp.Channel = await connection.createChannel();
-        return channel;
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-};
+const AGENT_VERSION = '1.0.0';
 
-const assertQueueAsync = async (
-    channel: amqp.Channel,
-    queueName: string
-): Promise<boolean> => {
-    try {
-        await channel.assertQueue(queueName, { durable: true });
-        return true;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-};
-
-const healthStatusUpdate = (channel: amqp.Channel, queue: string) => {
-    channel.sendToQueue(
-        queue,
-        Buffer.from(JSON.stringify({ message: "Service is running normally" })),
-        {
-            contentType: "application/json",
-            mandatory: true,
-        }
-    );
-};
-
-const onMessage = async (msg: amqp.ConsumeMessage | null): Promise<void> => {
-    if (msg)
-        console.log(" [x] Received %s", msg.content.toString());
-}
-
+/**
+ * Bootstrap the agent service
+ */
 (async () => {
-    let timer: NodeJS.Timeout;
-    const channel = await createChannelAsync(applicationConfig.mqQueueUrl);
-    if (!channel) {
-        exit(1);
-    }
-    await assertQueueAsync(channel, applicationConfig.mqHertbeatUrl);
+  try {
+    // Initialize RabbitMQ adapter
+    const rabbitMQ = new RabbitMQAdapter({
+      url: applicationConfig.mqQueueUrl,
+      onConnectionError: (error) => {
+        console.error('[Bootstrap] RabbitMQ connection error:', error);
+        process.exit(1);
+      },
+      onConnectionClose: () => {
+        console.log('[Bootstrap] RabbitMQ connection closed');
+        process.exit(1);
+      }
+    });
 
+    // Connect to RabbitMQ
+    await rabbitMQ.connect();
 
-    timer = setInterval(() => healthStatusUpdate(channel, applicationConfig.mqHertbeatUrl), 10 * 1000);
+    // Assert required queues
+    await rabbitMQ.assertQueue(applicationConfig.mqHertbeatUrl);
+    await rabbitMQ.assertQueue(applicationConfig.mqRequestUrl);
 
-    channel.consume(applicationConfig.mqRequestUrl, onMessage, { noAck: true })
+    // Initialize heartbeat monitor
+    const heartbeatMonitor = new HeartbeatMonitor({
+      queueName: applicationConfig.mqHertbeatUrl,
+      publisher: rabbitMQ
+    });
+
+    // Initialize agent service
+    const agentService = new AgentService({
+      version: AGENT_VERSION,
+      browserType: 'chromium',
+      browserPath: applicationConfig.browserPath,
+      messageConsumer: rabbitMQ,
+      messagePublisher: rabbitMQ,
+      healthMonitor: heartbeatMonitor,
+      requestQueueName: applicationConfig.mqRequestUrl
+    });
+
+    // Initialize lifecycle manager
+    const lifecycle = new AgentLifecycle({
+      agentService,
+      healthMonitor: heartbeatMonitor,
+      onShutdown: async () => {
+        await rabbitMQ.disconnect();
+      }
+    });
+
+    // Start the agent
+    await lifecycle.start();
+  } catch (error) {
+    console.error('[Bootstrap] Fatal error:', error);
+    process.exit(1);
+  }
 })();
