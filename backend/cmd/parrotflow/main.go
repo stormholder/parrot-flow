@@ -42,6 +42,9 @@ func main() {
 		err = database.AutoMigrate(
 			&models.Scenario{},
 			&models.ScenarioRun{},
+			&models.Tag{},
+			&models.Proxy{},
+			&models.Agent{},
 		)
 		FailOnError(err, "failed to migrate database")
 
