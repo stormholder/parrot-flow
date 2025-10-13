@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+// Domain errors
+var (
+	ErrTagAlreadyExists = errors.New("tag with this name already exists")
+	ErrTagNotFound      = errors.New("tag not found")
+)
+
 type TagID struct {
 	shared.ID
 }
