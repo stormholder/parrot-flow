@@ -1,0 +1,84 @@
+version: '3.8'
+
+# Development overrides with hot-reload and source mounting
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  # Backend - Hot reload with Air or native Go
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      # Mount source code for hot-reload
+      - ./backend:/app
+      # Preserve modules
+      - backend_modules:/go/pkg/mod
+    environment:
+      ENV: development
+      LOG_LEVEL: debug
+    # Override command for development
+    command: go run ./cmd/server
+
+  # Agent - Hot reload with nodemon
+  agent:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile.dev
+    volumes:
+      # Mount source code for hot-reload
+      - ./agent:/app
+      # Preserve node_modules
+      - agent_node_modules:/app/node_modules
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+    # Override command for development
+    command: npm run dev
+
+  # Frontend - Vite dev server with HMR (only in dev mode)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: parrotflow-frontend-dev
+    restart: unless-stopped
+    volumes:
+      # Mount source code for hot-reload
+      - ./frontend:/app
+      # Preserve node_modules
+      - frontend_node_modules:/app/node_modules
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://localhost:${BACKEND_PORT:-3000}
+    ports:
+      # Expose Vite dev server directly for HMR
+      - "${FRONTEND_DEV_PORT:-5173}:5173"
+    networks:
+      - parrotflow-network
+    # Override command for development
+    command: npm run dev -- --host 0.0.0.0
+
+  # Nginx - Proxy to Vite dev server for frontend
+  nginx:
+    volumes:
+      # Mount dev config that proxies to Vite
+      - ./nginx/conf.d/dev.conf:/etc/nginx/conf.d/default.conf:ro
+
+  # PostgreSQL - Expose port for local DB tools
+  postgres:
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  # RabbitMQ - Already exposed in base config
+  rabbitmq:
+    # Enable all management plugins for debugging
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-parrotflow}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-parrotflow_dev}
+      RABBITMQ_PLUGINS: rabbitmq_management rabbitmq_tracing
+
+volumes:
+  backend_modules:
+  agent_node_modules:
+  frontend_node_modules:

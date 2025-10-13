@@ -1,0 +1,39 @@
+# Root .dockerignore (if building from root context)
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+
+# Environment files
+.env
+.env.*
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Service-specific (these are better handled by service .dockerignore)
+**/node_modules
+**/dist
+**/build
+**/coverage
+**/*.db
+**/tmp

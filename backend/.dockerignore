@@ -1,0 +1,65 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+parrotflow
+
+# Test binary
+*.test
+
+# Output of go build
+bin/
+build/
+
+# Go workspace files
+go.work
+
+# Dependency directories
+vendor/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Editor directories and files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage.txt
+*.out
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Docker
+Dockerfile
+Dockerfile.dev
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Air (live reload tool) config
+.air.toml
+tmp/
