@@ -2,10 +2,9 @@ package proxy
 
 import (
 	"context"
-	"time"
 
 	"parrotflow/internal/domain/proxy"
-	"parrotflow/pkg/shared"
+	"parrotflow/internal/domain/shared"
 )
 
 type RecordHealthCommand struct {
@@ -16,11 +15,11 @@ type RecordHealthCommand struct {
 }
 
 type RecordHealthCommandHandler struct {
-	repository proxy.ProxyRepository
+	repository proxy.Repository
 	eventBus   shared.EventBus
 }
 
-func NewRecordHealthCommandHandler(repository proxy.ProxyRepository, eventBus shared.EventBus) *RecordHealthCommandHandler {
+func NewRecordHealthCommandHandler(repository proxy.Repository, eventBus shared.EventBus) *RecordHealthCommandHandler {
 	return &RecordHealthCommandHandler{
 		repository: repository,
 		eventBus:   eventBus,
@@ -45,7 +44,7 @@ func (h *RecordHealthCommandHandler) Handle(ctx context.Context, cmd RecordHealt
 
 	// Record success or failure
 	if cmd.Success {
-		p.RecordSuccess(time.Duration(cmd.LatencyMs) * time.Millisecond)
+		p.RecordSuccess(cmd.LatencyMs)
 	} else {
 		p.RecordFailure(cmd.ErrorMsg)
 	}

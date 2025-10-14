@@ -11,10 +11,10 @@ type GetProxyQuery struct {
 }
 
 type GetProxyQueryHandler struct {
-	repository proxy.ProxyRepository
+	repository proxy.Repository
 }
 
-func NewGetProxyQueryHandler(repository proxy.ProxyRepository) *GetProxyQueryHandler {
+func NewGetProxyQueryHandler(repository proxy.Repository) *GetProxyQueryHandler {
 	return &GetProxyQueryHandler{
 		repository: repository,
 	}

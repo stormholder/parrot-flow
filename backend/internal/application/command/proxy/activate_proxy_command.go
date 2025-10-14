@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"parrotflow/internal/domain/proxy"
-	"parrotflow/pkg/shared"
+	"parrotflow/internal/domain/shared"
 )
 
 type ActivateProxyCommand struct {
@@ -12,11 +12,11 @@ type ActivateProxyCommand struct {
 }
 
 type ActivateProxyCommandHandler struct {
-	repository proxy.ProxyRepository
+	repository proxy.Repository
 	eventBus   shared.EventBus
 }
 
-func NewActivateProxyCommandHandler(repository proxy.ProxyRepository, eventBus shared.EventBus) *ActivateProxyCommandHandler {
+func NewActivateProxyCommandHandler(repository proxy.Repository, eventBus shared.EventBus) *ActivateProxyCommandHandler {
 	return &ActivateProxyCommandHandler{
 		repository: repository,
 		eventBus:   eventBus,
@@ -40,9 +40,7 @@ func (h *ActivateProxyCommandHandler) Handle(ctx context.Context, cmd ActivatePr
 	}
 
 	// Activate proxy
-	if err := p.Activate(); err != nil {
-		return nil, err
-	}
+	p.Activate()
 
 	// Save to repository
 	if err := h.repository.Save(ctx, p); err != nil {

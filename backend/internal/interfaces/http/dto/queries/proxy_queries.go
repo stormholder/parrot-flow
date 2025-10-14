@@ -12,8 +12,8 @@ type GetProxyResponse struct {
 
 // ListProxiesRequest is the input for listing proxies
 type ListProxiesRequest struct {
-	Status *string  `query:"status" enum:"active,inactive,checking,failed" doc:"Filter by proxy status"`
-	Tags   []string `query:"tags" doc:"Filter by tag IDs (proxy must have all specified tags)"`
+	Status string   `query:"status" required:"false" enum:"active,inactive,checking,failed" doc:"Filter by proxy status"`
+	Tags   []string `query:"tags" required:"false" doc:"Filter by tag IDs (proxy must have all specified tags)"`
 }
 
 // ListProxiesResponse is the output for listing proxies

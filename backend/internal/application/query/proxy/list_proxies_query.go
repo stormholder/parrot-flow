@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"parrotflow/internal/domain/proxy"
+	"parrotflow/internal/domain/tag"
 )
 
 type ListProxiesQuery struct {
@@ -12,10 +13,10 @@ type ListProxiesQuery struct {
 }
 
 type ListProxiesQueryHandler struct {
-	repository proxy.ProxyRepository
+	repository proxy.Repository
 }
 
-func NewListProxiesQueryHandler(repository proxy.ProxyRepository) *ListProxiesQueryHandler {
+func NewListProxiesQueryHandler(repository proxy.Repository) *ListProxiesQueryHandler {
 	return &ListProxiesQueryHandler{
 		repository: repository,
 	}
@@ -24,7 +25,15 @@ func NewListProxiesQueryHandler(repository proxy.ProxyRepository) *ListProxiesQu
 func (h *ListProxiesQueryHandler) Handle(ctx context.Context, query ListProxiesQuery) ([]*proxy.Proxy, error) {
 	// If filtering by tags
 	if len(query.Tags) > 0 {
-		return h.repository.FindByTags(ctx, query.Tags)
+		tagIDs := make([]tag.TagID, len(query.Tags))
+		for i, tagStr := range query.Tags {
+			tagID, err := tag.NewTagID(tagStr)
+			if err != nil {
+				return nil, err
+			}
+			tagIDs[i] = tagID
+		}
+		return h.repository.FindByTags(ctx, tagIDs)
 	}
 
 	// If filtering by status

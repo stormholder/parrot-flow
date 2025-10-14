@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"parrotflow/internal/domain/proxy"
-	"parrotflow/pkg/shared"
+	"parrotflow/internal/domain/shared"
 )
 
 type DeleteProxyCommand struct {
@@ -12,11 +12,11 @@ type DeleteProxyCommand struct {
 }
 
 type DeleteProxyCommandHandler struct {
-	repository proxy.ProxyRepository
+	repository proxy.Repository
 	eventBus   shared.EventBus
 }
 
-func NewDeleteProxyCommandHandler(repository proxy.ProxyRepository, eventBus shared.EventBus) *DeleteProxyCommandHandler {
+func NewDeleteProxyCommandHandler(repository proxy.Repository, eventBus shared.EventBus) *DeleteProxyCommandHandler {
 	return &DeleteProxyCommandHandler{
 		repository: repository,
 		eventBus:   eventBus,

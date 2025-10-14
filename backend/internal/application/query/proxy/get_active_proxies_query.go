@@ -11,10 +11,10 @@ type GetActiveProxiesQuery struct {
 }
 
 type GetActiveProxiesQueryHandler struct {
-	repository proxy.ProxyRepository
+	repository proxy.Repository
 }
 
-func NewGetActiveProxiesQueryHandler(repository proxy.ProxyRepository) *GetActiveProxiesQueryHandler {
+func NewGetActiveProxiesQueryHandler(repository proxy.Repository) *GetActiveProxiesQueryHandler {
 	return &GetActiveProxiesQueryHandler{
 		repository: repository,
 	}

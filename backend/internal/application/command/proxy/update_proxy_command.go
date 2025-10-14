@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"parrotflow/internal/domain/proxy"
-	"parrotflow/pkg/shared"
+	"parrotflow/internal/domain/shared"
 )
 
 type UpdateProxyCommand struct {
@@ -18,11 +18,11 @@ type UpdateProxyCommand struct {
 }
 
 type UpdateProxyCommandHandler struct {
-	repository proxy.ProxyRepository
+	repository proxy.Repository
 	eventBus   shared.EventBus
 }
 
-func NewUpdateProxyCommandHandler(repository proxy.ProxyRepository, eventBus shared.EventBus) *UpdateProxyCommandHandler {
+func NewUpdateProxyCommandHandler(repository proxy.Repository, eventBus shared.EventBus) *UpdateProxyCommandHandler {
 	return &UpdateProxyCommandHandler{
 		repository: repository,
 		eventBus:   eventBus,
@@ -89,14 +89,9 @@ func (h *UpdateProxyCommandHandler) Handle(ctx context.Context, cmd UpdateProxyC
 			if err != nil {
 				return nil, err
 			}
-			if err := p.SetCredentials(credentials); err != nil {
-				return nil, err
-			}
+			p.SetCredentials(credentials)
 		}
 	}
-
-	// Mark as updated
-	p.UpdatedAt = shared.TimestampNow()
 
 	// Save to repository
 	if err := h.repository.Save(ctx, p); err != nil {

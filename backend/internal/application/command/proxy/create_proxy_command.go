@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"parrotflow/internal/domain/proxy"
-	"parrotflow/pkg/shared"
-	"parrotflow/pkg/shared/utils"
+	"parrotflow/internal/domain/shared"
+	"parrotflow/internal/domain/tag"
+	utils "parrotflow/pkg/shared"
 )
 
 type CreateProxyCommand struct {
@@ -19,11 +20,11 @@ type CreateProxyCommand struct {
 }
 
 type CreateProxyCommandHandler struct {
-	repository proxy.ProxyRepository
+	repository proxy.Repository
 	eventBus   shared.EventBus
 }
 
-func NewCreateProxyCommandHandler(repository proxy.ProxyRepository, eventBus shared.EventBus) *CreateProxyCommandHandler {
+func NewCreateProxyCommandHandler(repository proxy.Repository, eventBus shared.EventBus) *CreateProxyCommandHandler {
 	return &CreateProxyCommandHandler{
 		repository: repository,
 		eventBus:   eventBus,
@@ -64,16 +65,20 @@ func (h *CreateProxyCommandHandler) Handle(ctx context.Context, cmd CreateProxyC
 		if err != nil {
 			return nil, err
 		}
-		if err := p.SetCredentials(credentials); err != nil {
-			return nil, err
-		}
+		p.SetCredentials(credentials)
 	}
 
 	// Add tags if provided
 	if len(cmd.Tags) > 0 {
 		for _, tagIDStr := range cmd.Tags {
-			// Note: Tag validation should be done at the API layer
-			p.AddTag(tagIDStr)
+			tagID, err := tag.NewTagID(tagIDStr)
+			if err != nil {
+				return nil, err
+			}
+			if err := p.AddTag(tagID); err != nil {
+				// Ignore if tag already exists
+				continue
+			}
 		}
 	}
 
