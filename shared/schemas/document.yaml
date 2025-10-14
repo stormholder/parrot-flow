@@ -1,5 +1,315 @@
 components:
   schemas:
+    ActivateProxyResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ActivateProxyResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: Unique proxy identifier
+          type: string
+        name:
+          description: Proxy name
+          type: string
+        status:
+          description: Current proxy status (should be 'active')
+          type: string
+      required:
+        - id
+        - name
+        - status
+      type: object
+    AgentDTO:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/AgentDTO.json
+          format: uri
+          readOnly: true
+          type: string
+        capabilities:
+          $ref: "#/components/schemas/CapabilitiesDTO"
+          description: Agent capabilities
+        connection_info:
+          $ref: "#/components/schemas/ConnectionInfoDTO"
+          description: Connection information
+        current_run_count:
+          description: Current number of runs
+          format: int64
+          type: integer
+        id:
+          description: Agent ID
+          type: string
+        last_heartbeat_at:
+          description: Last heartbeat timestamp
+          type: string
+        name:
+          description: Agent name
+          type: string
+        registered_at:
+          description: Registration timestamp
+          type: string
+        status:
+          description: Agent status
+          type: string
+        tags:
+          description: Tag IDs
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        updated_at:
+          description: Update timestamp
+          type: string
+      required:
+        - id
+        - name
+        - status
+        - capabilities
+        - tags
+        - current_run_count
+        - registered_at
+        - updated_at
+        - connection_info
+      type: object
+    AssignRunResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/AssignRunResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        current_run_count:
+          description: Current number of runs
+          format: int64
+          type: integer
+        id:
+          description: Agent ID
+          type: string
+        name:
+          description: Agent name
+          type: string
+        status:
+          description: Agent status
+          type: string
+      required:
+        - id
+        - name
+        - status
+        - current_run_count
+      type: object
+    BrowserCapabilityDTO:
+      additionalProperties: false
+      properties:
+        headless:
+          description: Headless support
+          type: boolean
+        supported_extensions:
+          description: Supported extensions
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        type:
+          description: Browser type
+          enum:
+            - chromium
+            - firefox
+            - webkit
+          type: string
+        version:
+          description: Browser version
+          type: string
+      required:
+        - type
+        - version
+        - headless
+      type: object
+    CapabilitiesDTO:
+      additionalProperties: false
+      properties:
+        browsers:
+          description: Supported browsers
+          items:
+            $ref: "#/components/schemas/BrowserCapabilityDTO"
+          type:
+            - array
+            - "null"
+        features:
+          description: Additional features
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        os:
+          $ref: "#/components/schemas/OSInfoDTO"
+          description: Operating system information
+        proxy:
+          $ref: "#/components/schemas/ProxyCapabilityDTO"
+          description: Proxy support
+        resource:
+          $ref: "#/components/schemas/ResourceLimitsDTO"
+          description: Resource limits
+      required:
+        - browsers
+        - os
+        - proxy
+        - resource
+      type: object
+    ConnectionInfoDTO:
+      additionalProperties: false
+      properties:
+        hostname:
+          description: Agent hostname
+          type: string
+        ip_address:
+          description: Agent IP address
+          type: string
+        queue_name:
+          description: RabbitMQ queue name
+          type: string
+      required:
+        - queue_name
+      type: object
+    CreateProxyRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateProxyRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        host:
+          description: Proxy host/IP address
+          minLength: 1
+          type: string
+        name:
+          description: Proxy name (must be unique)
+          maxLength: 100
+          minLength: 1
+          type: string
+        password:
+          description: Optional password for authentication
+          type: string
+        port:
+          description: Proxy port
+          format: int64
+          maximum: 65535
+          minimum: 1
+          type: integer
+        protocol:
+          description: Proxy protocol
+          enum:
+            - http
+            - https
+            - socks5
+          type: string
+        tags:
+          description: Optional tag IDs to associate with this proxy
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        username:
+          description: Optional username for authentication
+          type: string
+      required:
+        - name
+        - host
+        - port
+        - protocol
+      type: object
+    CreateProxyResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateProxyResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        average_latency_ms:
+          description: Average latency in milliseconds
+          format: int64
+          type: integer
+        created_at:
+          description: Creation timestamp
+          type: string
+        failure_count:
+          description: Number of consecutive failures
+          format: int64
+          type: integer
+        has_credentials:
+          description: Whether proxy has authentication credentials
+          type: boolean
+        host:
+          description: Proxy host/IP address
+          type: string
+        id:
+          description: Unique proxy identifier
+          type: string
+        last_checked_at:
+          description: Last health check timestamp
+          type: string
+        name:
+          description: Proxy name
+          type: string
+        port:
+          description: Proxy port
+          format: int64
+          type: integer
+        protocol:
+          description: Proxy protocol
+          type: string
+        status:
+          description: Current proxy status
+          type: string
+        success_count:
+          description: Total successful connections
+          format: int64
+          type: integer
+        tags:
+          description: Associated tag IDs
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        updated_at:
+          description: Last update timestamp
+          type: string
+      required:
+        - id
+        - name
+        - host
+        - port
+        - protocol
+        - status
+        - has_credentials
+        - tags
+        - failure_count
+        - success_count
+        - average_latency_ms
+        - created_at
+        - updated_at
+      type: object
     CreateRunRequestBody:
       additionalProperties: false
       properties:
@@ -99,6 +409,116 @@ components:
         - created_at
         - updated_at
       type: object
+    CreateTagRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        category:
+          description: Tag category
+          enum:
+            - system
+            - custom
+            - capacity
+            - region
+          type: string
+        color:
+          description: Hex color (#RRGGBB)
+          pattern: ^#[0-9A-Fa-f]{6}$
+          type: string
+        description:
+          description: Tag description
+          type: string
+        name:
+          description: Tag name (lowercase, unique)
+          maxLength: 100
+          minLength: 1
+          type: string
+      required:
+        - name
+        - category
+      type: object
+    CreateTagResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        category:
+          type: string
+        color:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        is_system:
+          type: boolean
+        name:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - name
+        - category
+        - description
+        - color
+        - is_system
+        - created_at
+        - updated_at
+      type: object
+    DeactivateProxyResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeactivateProxyResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: Unique proxy identifier
+          type: string
+        name:
+          description: Proxy name
+          type: string
+        status:
+          description: Current proxy status (should be 'inactive')
+          type: string
+      required:
+        - id
+        - name
+        - status
+      type: object
+    DeleteProxyResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteProxyResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Confirmation message
+          type: string
+      required:
+        - message
+      type: object
     DeleteScenarioResponseBody:
       additionalProperties: false
       properties:
@@ -113,6 +533,37 @@ components:
           type: boolean
       required:
         - success
+      type: object
+    DeleteTagResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteTagResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        success:
+          type: boolean
+      required:
+        - success
+      type: object
+    DeregisterAgentResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeregisterAgentResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Success message
+          type: string
+      required:
+        - message
       type: object
     ErrorDetail:
       additionalProperties: false
@@ -173,6 +624,56 @@ components:
           format: uri
           type: string
       type: object
+    GetActiveProxiesResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetActiveProxiesResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        proxies:
+          description: List of active proxies
+          items:
+            $ref: "#/components/schemas/ProxyDTO"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of active proxies
+          format: int64
+          type: integer
+      required:
+        - proxies
+        - total
+      type: object
+    GetAvailableAgentsResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAvailableAgentsResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        agents:
+          description: List of available agents
+          items:
+            $ref: "#/components/schemas/AgentDTO"
+          type:
+            - array
+            - "null"
+        count:
+          description: Total number of available agents
+          format: int64
+          type: integer
+      required:
+        - agents
+        - count
+      type: object
     GetRunResponseBody:
       additionalProperties: false
       properties:
@@ -207,6 +708,67 @@ components:
         - created_at
         - updated_at
       type: object
+    GetStaleAgentsResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetStaleAgentsResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        agents:
+          description: List of stale agents
+          items:
+            $ref: "#/components/schemas/AgentDTO"
+          type:
+            - array
+            - "null"
+        count:
+          description: Total number of stale agents
+          format: int64
+          type: integer
+      required:
+        - agents
+        - count
+      type: object
+    GetTagResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetTagResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        category:
+          type: string
+        color:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        is_system:
+          type: boolean
+        name:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - name
+        - category
+        - description
+        - color
+        - is_system
+        - created_at
+        - updated_at
+      type: object
     GreetingOutputBody:
       additionalProperties: false
       properties:
@@ -224,6 +786,56 @@ components:
           type: string
       required:
         - message
+      type: object
+    ListAgentsResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ListAgentsResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        agents:
+          description: List of agents
+          items:
+            $ref: "#/components/schemas/AgentDTO"
+          type:
+            - array
+            - "null"
+        count:
+          description: Total number of agents
+          format: int64
+          type: integer
+      required:
+        - agents
+        - count
+      type: object
+    ListProxiesResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ListProxiesResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        proxies:
+          description: List of proxies
+          items:
+            $ref: "#/components/schemas/ProxyDTO"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of proxies returned
+          format: int64
+          type: integer
+      required:
+        - proxies
+        - total
       type: object
     ListRunsResponseBody:
       additionalProperties: false
@@ -286,6 +898,362 @@ components:
         - total
         - page
         - rpp
+      type: object
+    ListTagsResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ListTagsResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        tags:
+          items:
+            $ref: "#/components/schemas/TagDTO"
+          type:
+            - array
+            - "null"
+      required:
+        - tags
+      type: object
+    OSInfoDTO:
+      additionalProperties: false
+      properties:
+        architecture:
+          description: CPU architecture
+          enum:
+            - amd64
+            - arm64
+            - "386"
+            - arm
+          type: string
+        platform:
+          description: Operating system platform
+          enum:
+            - linux
+            - darwin
+            - windows
+          type: string
+        version:
+          description: OS version
+          type: string
+      required:
+        - platform
+        - architecture
+        - version
+      type: object
+    ProxyCapabilityDTO:
+      additionalProperties: false
+      properties:
+        supported_protocols:
+          description: Supported proxy protocols
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        supports_proxy:
+          description: Whether proxy is supported
+          type: boolean
+      required:
+        - supports_proxy
+      type: object
+    ProxyDTO:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ProxyDTO.json
+          format: uri
+          readOnly: true
+          type: string
+        average_latency_ms:
+          description: Average latency in milliseconds
+          format: int64
+          type: integer
+        connection_url:
+          description: Full proxy connection URL
+          type: string
+        created_at:
+          description: Creation timestamp
+          type: string
+        failure_count:
+          description: Number of consecutive failures
+          format: int64
+          type: integer
+        has_credentials:
+          description: Whether proxy has authentication credentials
+          type: boolean
+        host:
+          description: Proxy host/IP address
+          type: string
+        id:
+          description: Unique proxy identifier
+          type: string
+        last_checked_at:
+          description: Last health check timestamp
+          type: string
+        last_failure_at:
+          description: Last failure timestamp
+          type: string
+        name:
+          description: Proxy name
+          type: string
+        port:
+          description: Proxy port
+          format: int64
+          type: integer
+        protocol:
+          description: Proxy protocol (http, https, socks5)
+          type: string
+        status:
+          description: Current proxy status
+          type: string
+        success_count:
+          description: Total successful connections
+          format: int64
+          type: integer
+        tags:
+          description: Associated tag IDs
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        updated_at:
+          description: Last update timestamp
+          type: string
+      required:
+        - id
+        - name
+        - host
+        - port
+        - protocol
+        - status
+        - connection_url
+        - has_credentials
+        - tags
+        - failure_count
+        - success_count
+        - average_latency_ms
+        - created_at
+        - updated_at
+      type: object
+    RecordHealthRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/RecordHealthRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        error_msg:
+          description: Error message (for failed checks)
+          type: string
+        latency_ms:
+          description: Latency in milliseconds (for successful checks)
+          format: int64
+          minimum: 0
+          type: integer
+        success:
+          description: Whether the health check succeeded
+          type: boolean
+      required:
+        - success
+      type: object
+    RecordHealthResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/RecordHealthResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        average_latency_ms:
+          description: Average latency in milliseconds
+          format: int64
+          type: integer
+        created_at:
+          description: Creation timestamp
+          type: string
+        failure_count:
+          description: Number of consecutive failures
+          format: int64
+          type: integer
+        has_credentials:
+          description: Whether proxy has authentication credentials
+          type: boolean
+        host:
+          description: Proxy host/IP address
+          type: string
+        id:
+          description: Unique proxy identifier
+          type: string
+        last_checked_at:
+          description: Last health check timestamp
+          type: string
+        name:
+          description: Proxy name
+          type: string
+        port:
+          description: Proxy port
+          format: int64
+          type: integer
+        protocol:
+          description: Proxy protocol
+          type: string
+        status:
+          description: Current proxy status
+          type: string
+        success_count:
+          description: Total successful connections
+          format: int64
+          type: integer
+        tags:
+          description: Associated tag IDs
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        updated_at:
+          description: Last update timestamp
+          type: string
+      required:
+        - id
+        - name
+        - host
+        - port
+        - protocol
+        - status
+        - has_credentials
+        - tags
+        - failure_count
+        - success_count
+        - average_latency_ms
+        - created_at
+        - updated_at
+      type: object
+    RegisterAgentRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/RegisterAgentRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        capabilities:
+          $ref: "#/components/schemas/CapabilitiesDTO"
+          description: Agent capabilities
+        connection_info:
+          $ref: "#/components/schemas/ConnectionInfoDTO"
+          description: Agent connection information
+        name:
+          description: Agent name
+          maxLength: 255
+          minLength: 1
+          type: string
+      required:
+        - name
+        - capabilities
+        - connection_info
+      type: object
+    RegisterAgentResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/RegisterAgentResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        capabilities:
+          $ref: "#/components/schemas/CapabilitiesDTO"
+          description: Agent capabilities
+        connection_info:
+          $ref: "#/components/schemas/ConnectionInfoDTO"
+          description: Agent connection information
+        id:
+          description: Agent ID
+          type: string
+        name:
+          description: Agent name
+          type: string
+        registered_at:
+          description: Registration timestamp
+          type: string
+        status:
+          description: Agent status
+          type: string
+      required:
+        - id
+        - name
+        - status
+        - capabilities
+        - connection_info
+        - registered_at
+      type: object
+    ReleaseRunResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ReleaseRunResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        current_run_count:
+          description: Current number of runs
+          format: int64
+          type: integer
+        id:
+          description: Agent ID
+          type: string
+        name:
+          description: Agent name
+          type: string
+        status:
+          description: Agent status
+          type: string
+      required:
+        - id
+        - name
+        - status
+        - current_run_count
+      type: object
+    ResourceLimitsDTO:
+      additionalProperties: false
+      properties:
+        max_concurrent_runs:
+          description: Maximum concurrent runs
+          format: int64
+          minimum: 1
+          type: integer
+        max_cpu_cores:
+          description: Maximum CPU cores
+          format: int64
+          minimum: 1
+          type: integer
+        max_memory_mb:
+          description: Maximum memory in MB
+          format: int64
+          minimum: 1
+          type: integer
+      required:
+        - max_concurrent_runs
+        - max_memory_mb
+        - max_cpu_cores
       type: object
     RunListItem:
       additionalProperties: false
@@ -365,6 +1333,250 @@ components:
         - status
         - started_at
       type: object
+    TagDTO:
+      additionalProperties: false
+      properties:
+        category:
+          type: string
+        color:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        is_system:
+          type: boolean
+        name:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - name
+        - category
+        - description
+        - color
+        - is_system
+        - created_at
+        - updated_at
+      type: object
+    UpdateAgentRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateAgentRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        capabilities:
+          $ref: "#/components/schemas/CapabilitiesDTO"
+          description: Agent capabilities
+        name:
+          description: Agent name
+          maxLength: 255
+          minLength: 1
+          type: string
+        tags_to_add:
+          description: Tag IDs to add
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        tags_to_remove:
+          description: Tag IDs to remove
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+      type: object
+    UpdateAgentResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateAgentResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        capabilities:
+          $ref: "#/components/schemas/CapabilitiesDTO"
+          description: Agent capabilities
+        id:
+          description: Agent ID
+          type: string
+        name:
+          description: Agent name
+          type: string
+        status:
+          description: Agent status
+          type: string
+        tags:
+          description: Tag IDs
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        updated_at:
+          description: Update timestamp
+          type: string
+      required:
+        - id
+        - name
+        - status
+        - capabilities
+        - tags
+        - updated_at
+      type: object
+    UpdateHeartbeatResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateHeartbeatResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: Agent ID
+          type: string
+        last_heartbeat_at:
+          description: Last heartbeat timestamp
+          type: string
+        name:
+          description: Agent name
+          type: string
+        status:
+          description: Agent status
+          type: string
+      required:
+        - id
+        - name
+        - status
+        - last_heartbeat_at
+      type: object
+    UpdateProxyRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateProxyRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        host:
+          description: Proxy host/IP address
+          minLength: 1
+          type: string
+        name:
+          description: Proxy name
+          maxLength: 100
+          minLength: 1
+          type: string
+        password:
+          description: Password for authentication
+          type: string
+        port:
+          description: Proxy port
+          format: int64
+          maximum: 65535
+          minimum: 1
+          type: integer
+        protocol:
+          description: Proxy protocol
+          enum:
+            - http
+            - https
+            - socks5
+          type: string
+        username:
+          description: Username for authentication
+          type: string
+      type: object
+    UpdateProxyResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateProxyResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        average_latency_ms:
+          description: Average latency in milliseconds
+          format: int64
+          type: integer
+        created_at:
+          description: Creation timestamp
+          type: string
+        failure_count:
+          description: Number of consecutive failures
+          format: int64
+          type: integer
+        has_credentials:
+          description: Whether proxy has authentication credentials
+          type: boolean
+        host:
+          description: Proxy host/IP address
+          type: string
+        id:
+          description: Unique proxy identifier
+          type: string
+        last_checked_at:
+          description: Last health check timestamp
+          type: string
+        name:
+          description: Proxy name
+          type: string
+        port:
+          description: Proxy port
+          format: int64
+          type: integer
+        protocol:
+          description: Proxy protocol
+          type: string
+        status:
+          description: Current proxy status
+          type: string
+        success_count:
+          description: Total successful connections
+          format: int64
+          type: integer
+        tags:
+          description: Associated tag IDs
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        updated_at:
+          description: Last update timestamp
+          type: string
+      required:
+        - id
+        - name
+        - host
+        - port
+        - protocol
+        - status
+        - has_credentials
+        - tags
+        - failure_count
+        - success_count
+        - average_latency_ms
+        - created_at
+        - updated_at
+      type: object
     UpdateScenarioRequestBody:
       additionalProperties: false
       properties:
@@ -414,6 +1626,57 @@ components:
         - icon
         - updated_at
       type: object
+    UpdateTagRequestBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateTagRequestBody.json
+          format: uri
+          readOnly: true
+          type: string
+        color:
+          description: Hex color (#RRGGBB)
+          pattern: ^#[0-9A-Fa-f]{6}$
+          type: string
+        description:
+          description: Tag description
+          type: string
+      type: object
+    UpdateTagResponseBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateTagResponseBody.json
+          format: uri
+          readOnly: true
+          type: string
+        category:
+          type: string
+        color:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        is_system:
+          type: boolean
+        name:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - name
+        - category
+        - description
+        - color
+        - is_system
+        - updated_at
+      type: object
 info:
   title: Parrot Flow API
   version: 1.0.0
@@ -439,6 +1702,622 @@ paths:
       summary: Root
       tags:
         - system
+  /api/agents/:
+    get:
+      description: Lists all agents with optional filters (status, browser_type, platform, tags, only_healthy)
+      operationId: list-agents
+      parameters:
+        - description: Filter by status
+          explode: false
+          in: query
+          name: status
+          schema:
+            description: Filter by status
+            enum:
+              - online
+              - offline
+              - busy
+              - idle
+              - disconnected
+            type: string
+        - description: Filter by browser type
+          explode: false
+          in: query
+          name: browser_type
+          schema:
+            description: Filter by browser type
+            enum:
+              - chromium
+              - firefox
+              - webkit
+            type: string
+        - description: Filter by platform
+          explode: false
+          in: query
+          name: platform
+          schema:
+            description: Filter by platform
+            enum:
+              - linux
+              - darwin
+              - windows
+            type: string
+        - description: Filter only healthy agents
+          explode: false
+          in: query
+          name: only_healthy
+          schema:
+            description: Filter only healthy agents
+            type: boolean
+        - description: Comma-separated tag IDs
+          explode: false
+          in: query
+          name: tag_ids
+          schema:
+            description: Comma-separated tag IDs
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListAgentsResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List agents
+      tags:
+        - agents
+    post:
+      description: Registers a new agent with the system (auto-registration on first heartbeat)
+      operationId: register-agent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterAgentRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterAgentResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Register a new agent
+      tags:
+        - agents
+  /api/agents/available:
+    get:
+      description: Retrieves agents that can accept new runs, with optional filters (browser_type, platform, tags)
+      operationId: get-available-agents
+      parameters:
+        - description: Filter by browser type
+          explode: false
+          in: query
+          name: browser_type
+          schema:
+            description: Filter by browser type
+            enum:
+              - chromium
+              - firefox
+              - webkit
+            type: string
+        - description: Filter by platform
+          explode: false
+          in: query
+          name: platform
+          schema:
+            description: Filter by platform
+            enum:
+              - linux
+              - darwin
+              - windows
+            type: string
+        - description: Comma-separated tag IDs
+          explode: false
+          in: query
+          name: tag_ids
+          schema:
+            description: Comma-separated tag IDs
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAvailableAgentsResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get available agents
+      tags:
+        - agents
+  /api/agents/stale:
+    get:
+      description: Retrieves agents that haven't sent a heartbeat within the timeout period
+      operationId: get-stale-agents
+      parameters:
+        - description: Heartbeat timeout in minutes
+          explode: false
+          in: query
+          name: heartbeat_timeout_minutes
+          schema:
+            default: 5
+            description: Heartbeat timeout in minutes
+            format: int64
+            minimum: 1
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetStaleAgentsResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get stale agents
+      tags:
+        - agents
+  /api/agents/{id}:
+    delete:
+      description: Marks the agent as offline and deregisters it from the system
+      operationId: deregister-agent
+      parameters:
+        - description: Agent ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Agent ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeregisterAgentResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Deregister an agent
+      tags:
+        - agents
+    get:
+      description: Retrieves a single agent by its ID
+      operationId: get-agent
+      parameters:
+        - description: Agent ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Agent ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentDTO"
+                description: Agent details
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get an agent by ID
+      tags:
+        - agents
+    patch:
+      description: Updates agent properties (name, capabilities, tags)
+      operationId: update-agent
+      parameters:
+        - description: Agent ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Agent ID
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAgentRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateAgentResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update an agent
+      tags:
+        - agents
+  /api/agents/{id}/assign-run:
+    post:
+      description: Assigns a run to the agent, incrementing its run count and updating status
+      operationId: assign-run-to-agent
+      parameters:
+        - description: Agent ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Agent ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignRunResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Assign a run to an agent
+      tags:
+        - agents
+  /api/agents/{id}/heartbeat:
+    post:
+      description: Updates the agent's last heartbeat timestamp and auto-recovers from disconnected status
+      operationId: update-agent-heartbeat
+      parameters:
+        - description: Agent ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Agent ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateHeartbeatResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update agent heartbeat
+      tags:
+        - agents
+  /api/agents/{id}/release-run:
+    post:
+      description: Releases a run from the agent, decrementing its run count and updating status
+      operationId: release-run-from-agent
+      parameters:
+        - description: Agent ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Agent ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReleaseRunResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Release a run from an agent
+      tags:
+        - agents
+  /api/proxies/:
+    get:
+      description: Lists all proxies with optional filtering by status or tags
+      operationId: list-proxies
+      parameters:
+        - description: Filter by proxy status
+          explode: false
+          in: query
+          name: status
+          schema:
+            description: Filter by proxy status
+            enum:
+              - active
+              - inactive
+              - checking
+              - failed
+            type: string
+        - description: Filter by tag IDs (proxy must have all specified tags)
+          explode: false
+          in: query
+          name: tags
+          schema:
+            description: Filter by tag IDs (proxy must have all specified tags)
+            items:
+              type: string
+            type:
+              - array
+              - "null"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProxiesResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List proxies
+      tags:
+        - proxies
+    post:
+      description: Creates a new proxy server configuration with optional authentication credentials and tags
+      operationId: create-proxy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProxyRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateProxyResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Create a new proxy
+      tags:
+        - proxies
+  /api/proxies/active:
+    get:
+      description: Retrieves all proxies with active status
+      operationId: get-active-proxies
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetActiveProxiesResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get active proxies
+      tags:
+        - proxies
+  /api/proxies/{id}:
+    delete:
+      description: Deletes a proxy configuration
+      operationId: delete-proxy
+      parameters:
+        - description: Proxy ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Proxy ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteProxyResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete proxy
+      tags:
+        - proxies
+    get:
+      description: Retrieves a single proxy configuration by its unique identifier
+      operationId: get-proxy
+      parameters:
+        - description: Proxy ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Proxy ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProxyDTO"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get proxy by ID
+      tags:
+        - proxies
+    patch:
+      description: Updates an existing proxy's configuration (name, host, port, protocol, credentials)
+      operationId: update-proxy
+      parameters:
+        - description: Proxy ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Proxy ID
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProxyRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateProxyResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update proxy
+      tags:
+        - proxies
+  /api/proxies/{id}/activate:
+    post:
+      description: Activates a proxy, making it available for use
+      operationId: activate-proxy
+      parameters:
+        - description: Proxy ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Proxy ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivateProxyResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Activate proxy
+      tags:
+        - proxies
+  /api/proxies/{id}/deactivate:
+    post:
+      description: Deactivates a proxy, removing it from the available pool
+      operationId: deactivate-proxy
+      parameters:
+        - description: Proxy ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Proxy ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeactivateProxyResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Deactivate proxy
+      tags:
+        - proxies
+  /api/proxies/{id}/health:
+    post:
+      description: Records the result of a health check (success or failure) for a proxy
+      operationId: record-proxy-health
+      parameters:
+        - description: Proxy ID
+          in: path
+          name: id
+          required: true
+          schema:
+            description: Proxy ID
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecordHealthRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecordHealthResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Record health check
+      tags:
+        - proxies
   /api/runs:
     get:
       description: Get a list of runs with optional filtering
@@ -709,6 +2588,146 @@ paths:
       summary: Update a scenario
       tags:
         - scenarios
+  /api/tags/:
+    get:
+      description: Get a list of tags with optional category filtering
+      operationId: list-tags
+      parameters:
+        - description: Filter by category (optional)
+          explode: false
+          in: query
+          name: category
+          schema:
+            description: Filter by category (optional)
+            enum:
+              - system
+              - custom
+              - capacity
+              - region
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListTagsResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List tags
+      tags:
+        - tags
+    post:
+      description: Create a new tag for labeling entities
+      operationId: create-tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTagResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Create a new tag
+      tags:
+        - tags
+  /api/tags/{id}:
+    delete:
+      description: Delete a tag by its ID (system tags cannot be deleted)
+      operationId: delete-tag
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTagResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete a tag
+      tags:
+        - tags
+    get:
+      description: Retrieve a specific tag by its ID
+      operationId: get-tag
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTagResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a tag by ID
+      tags:
+        - tags
+    patch:
+      description: Update an existing tag (description and color only)
+      operationId: update-tag
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagRequestBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTagResponseBody"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update a tag
+      tags:
+        - tags
   /health:
     get:
       description: Check the health status of the API

@@ -42,11 +42,17 @@ func main() {
 		err = database.AutoMigrate(
 			&models.Scenario{},
 			&models.ScenarioRun{},
+			&models.Tag{},
+			&models.Proxy{},
+			&models.Agent{},
 		)
 		FailOnError(err, "failed to migrate database")
 
 		scenarioRepository := persistence.NewScenarioRepository(database)
 		runRepository := persistence.NewRunRepository(database)
+		tagRepository := persistence.NewTagRepository(database)
+		proxyRepository := persistence.NewProxyRepository(database)
+		agentRepository := persistence.NewAgentRepository(database)
 
 		eventBus := events.NewAsyncEventBus()
 		eventBus.Subscribe(events.NewScenarioCreatedHandler())
@@ -63,6 +69,9 @@ func main() {
 		routes.RegisterSystemRoutes(&api)
 		routes.RegisterScenarioRoutes(&api, scenarioRepository, eventBus)
 		routes.RegisterRunRoutes(&api, runRepository, scenarioRepository, eventBus)
+		routes.RegisterTagRoutes(&api, tagRepository, eventBus)
+		routes.RegisterProxyRoutes(&api, proxyRepository, eventBus)
+		routes.RegisterAgentRoutes(&api, agentRepository, eventBus)
 
 		hooks.OnStart(func() {
 			fmt.Printf("Starting server on port %d...\n", options.Port)
