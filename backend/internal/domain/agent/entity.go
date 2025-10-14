@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+// Domain errors
+var (
+	ErrAgentAlreadyExists = errors.New("agent already exists")
+	ErrAgentNotFound      = errors.New("agent not found")
+)
+
 type AgentID struct {
 	shared.ID
 }
