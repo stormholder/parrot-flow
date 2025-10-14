@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+// Domain errors
+var (
+	ErrProxyAlreadyExists = errors.New("proxy already exists")
+	ErrProxyNotFound      = errors.New("proxy not found")
+)
+
 type ProxyID struct {
 	shared.ID
 }
