@@ -1,27 +1,11 @@
 package routes
 
 import (
-	command "parrotflow/internal/application/command/scenario"
-	query "parrotflow/internal/application/query/scenario"
-	"parrotflow/internal/infrastructure/events"
-	"parrotflow/internal/infrastructure/persistence"
-	"parrotflow/internal/interfaces/http/handlers"
-
 	"github.com/danielgtaylor/huma/v2"
+	"parrotflow/internal/interfaces/http/handlers"
 )
 
-func RegisterScenarioRoutes(
-	api *huma.API,
-	scenarioRepository *persistence.ScenarioRepository,
-	eventBus *events.AsyncEventBus,
-) {
-	scenarioHandler := handlers.NewScenarioHandler(
-		command.NewCreateScenarioCommandHandler(scenarioRepository, eventBus),
-		command.NewUpdateScenarioCommandHandler(scenarioRepository, eventBus),
-		command.NewDeleteScenarioCommandHandler(scenarioRepository, eventBus),
-		query.NewGetScenarioQueryHandler(scenarioRepository),
-		query.NewListScenariosQueryHandler(scenarioRepository),
-	)
+func RegisterScenarioRoutes(api *huma.API, scenarioHandler *handlers.ScenarioHandler) {
 
 	huma.Register(*api, huma.Operation{
 		OperationID: "create-scenario",

@@ -1,27 +1,11 @@
 package routes
 
 import (
-	command "parrotflow/internal/application/command/tag"
-	query "parrotflow/internal/application/query/tag"
-	"parrotflow/internal/infrastructure/events"
-	"parrotflow/internal/infrastructure/persistence"
-	"parrotflow/internal/interfaces/http/handlers"
-
 	"github.com/danielgtaylor/huma/v2"
+	"parrotflow/internal/interfaces/http/handlers"
 )
 
-func RegisterTagRoutes(
-	api *huma.API,
-	tagRepository *persistence.TagRepository,
-	eventBus *events.AsyncEventBus,
-) {
-	tagHandler := handlers.NewTagHandler(
-		command.NewCreateTagCommandHandler(tagRepository, eventBus),
-		command.NewUpdateTagCommandHandler(tagRepository, eventBus),
-		command.NewDeleteTagCommandHandler(tagRepository, eventBus),
-		query.NewGetTagQueryHandler(tagRepository),
-		query.NewListTagsQueryHandler(tagRepository),
-	)
+func RegisterTagRoutes(api *huma.API, tagHandler *handlers.TagHandler) {
 
 	huma.Register(*api, huma.Operation{
 		OperationID: "create-tag",

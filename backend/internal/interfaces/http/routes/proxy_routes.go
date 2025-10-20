@@ -2,41 +2,11 @@ package routes
 
 import (
 	"github.com/danielgtaylor/huma/v2"
-
-	proxyCommand "parrotflow/internal/application/command/proxy"
-	proxyQuery "parrotflow/internal/application/query/proxy"
-	"parrotflow/internal/domain/proxy"
-	"parrotflow/internal/domain/shared"
 	"parrotflow/internal/interfaces/http/handlers"
 )
 
 // RegisterProxyRoutes registers all proxy-related routes
-func RegisterProxyRoutes(api *huma.API, proxyRepository proxy.Repository, eventBus shared.EventBus) {
-	// Initialize command handlers
-	createCommandHandler := proxyCommand.NewCreateProxyCommandHandler(proxyRepository, eventBus)
-	updateCommandHandler := proxyCommand.NewUpdateProxyCommandHandler(proxyRepository, eventBus)
-	deleteCommandHandler := proxyCommand.NewDeleteProxyCommandHandler(proxyRepository, eventBus)
-	recordHealthCommandHandler := proxyCommand.NewRecordHealthCommandHandler(proxyRepository, eventBus)
-	activateCommandHandler := proxyCommand.NewActivateProxyCommandHandler(proxyRepository, eventBus)
-	deactivateCommandHandler := proxyCommand.NewDeactivateProxyCommandHandler(proxyRepository, eventBus)
-
-	// Initialize query handlers
-	getQueryHandler := proxyQuery.NewGetProxyQueryHandler(proxyRepository)
-	listQueryHandler := proxyQuery.NewListProxiesQueryHandler(proxyRepository)
-	getActiveQueryHandler := proxyQuery.NewGetActiveProxiesQueryHandler(proxyRepository)
-
-	// Initialize HTTP handler
-	handler := handlers.NewProxyHandler(
-		createCommandHandler,
-		updateCommandHandler,
-		deleteCommandHandler,
-		recordHealthCommandHandler,
-		activateCommandHandler,
-		deactivateCommandHandler,
-		getQueryHandler,
-		listQueryHandler,
-		getActiveQueryHandler,
-	)
+func RegisterProxyRoutes(api *huma.API, handler *handlers.ProxyHandler) {
 
 	// Register routes
 
