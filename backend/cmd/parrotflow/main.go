@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"parrotflow/internal/infrastructure/events"
-	"parrotflow/internal/infrastructure/persistence"
+
+	"parrotflow/internal/container"
 	"parrotflow/internal/interfaces/http/routes"
 	"parrotflow/internal/models"
 
@@ -22,12 +22,6 @@ type Options struct {
 	DbPath string `help:"Database file path" short:"d" default:"store.db"`
 }
 
-type GreetingOutput struct {
-	Body struct {
-		Message string `json:"message" example:"Hello, world!" doc:"Greeting message"`
-	}
-}
-
 func FailOnError(err error, msg string) {
 	if err != nil {
 		log.Panicf("%s: %s", msg, err)
@@ -36,9 +30,11 @@ func FailOnError(err error, msg string) {
 
 func main() {
 	cli := humacli.New(func(hooks humacli.Hooks, options *Options) {
+		// Initialize database
 		database, err := gorm.Open(sqlite.Open(options.DbPath), &gorm.Config{})
 		FailOnError(err, "failed to connect to database")
 
+		// Run migrations
 		err = database.AutoMigrate(
 			&models.Scenario{},
 			&models.ScenarioRun{},
@@ -48,31 +44,18 @@ func main() {
 		)
 		FailOnError(err, "failed to migrate database")
 
-		scenarioRepository := persistence.NewScenarioRepository(database)
-		runRepository := persistence.NewRunRepository(database)
-		tagRepository := persistence.NewTagRepository(database)
-		proxyRepository := persistence.NewProxyRepository(database)
-		agentRepository := persistence.NewAgentRepository(database)
+		// Initialize application with Wire DI
+		app, err := container.InitializeApp(database)
+		FailOnError(err, "failed to initialize application")
 
-		eventBus := events.NewAsyncEventBus()
-		eventBus.Subscribe(events.NewScenarioCreatedHandler())
-		eventBus.Subscribe(events.NewScenarioUpdatedHandler())
-		eventBus.Subscribe(events.NewScenarioDeletedHandler())
-		eventBus.Subscribe(events.NewRunCreatedHandler())
-		eventBus.Subscribe(events.NewRunStartedHandler())
-		eventBus.Subscribe(events.NewRunCompletedHandler())
-		eventBus.Subscribe(events.NewRunFailedHandler())
-
+		// Setup HTTP router and API
 		router := chi.NewMux()
 		api := humachi.New(router, huma.DefaultConfig("Parrot Flow API", "1.0.0"))
 
-		routes.RegisterSystemRoutes(&api)
-		routes.RegisterScenarioRoutes(&api, scenarioRepository, eventBus)
-		routes.RegisterRunRoutes(&api, runRepository, scenarioRepository, eventBus)
-		routes.RegisterTagRoutes(&api, tagRepository, eventBus)
-		routes.RegisterProxyRoutes(&api, proxyRepository, eventBus)
-		routes.RegisterAgentRoutes(&api, agentRepository, eventBus)
+		// Register all routes
+		routes.RegisterAllRoutes(&api, app)
 
+		// Start server
 		hooks.OnStart(func() {
 			fmt.Printf("Starting server on port %d...\n", options.Port)
 			http.ListenAndServe(fmt.Sprintf(":%d", options.Port), router)
