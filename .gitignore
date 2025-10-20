@@ -66,3 +66,4 @@ logs/
 # Temporary files
 tmp/
 temp/
+backend/internal/**/*_gen.go
