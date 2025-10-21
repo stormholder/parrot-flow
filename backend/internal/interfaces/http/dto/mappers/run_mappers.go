@@ -6,70 +6,90 @@ import (
 	"parrotflow/internal/interfaces/http/dto/queries"
 )
 
-func ToGetRunResponse(run *run.Run) *queries.GetRunResponse {
-	response := &queries.GetRunResponse{}
-	response.Body.ID = run.Id.String()
-	response.Body.ScenarioID = run.ScenarioID.String()
-	response.Body.Status = run.Status.String()
-	response.Body.Parameters = run.Parameters
-	response.Body.CreatedAt = run.CreatedAt.Time().Format("2006-01-02T15:04:05Z")
-	response.Body.UpdatedAt = run.UpdatedAt.Time().Format("2006-01-02T15:04:05Z")
-
-	if run.StartedAt != nil {
-		startedAt := run.StartedAt.Time().Format("2006-01-02T15:04:05Z")
-		response.Body.StartedAt = &startedAt
+func buildRunDTO(r *run.Run) queries.RunListItem {
+	startedAt := ""
+	if r.StartedAt != nil {
+		startedAt = FormatTimestamp(r.StartedAt.Time())
 	}
-	if run.FinishedAt != nil {
-		finishedAt := run.FinishedAt.Time().Format("2006-01-02T15:04:05Z")
-		response.Body.FinishedAt = &finishedAt
+	finishedAt := ""
+	if r.FinishedAt != nil {
+		finishedAt = FormatTimestamp(r.FinishedAt.Time())
 	}
 
-	return response
+	return queries.RunListItem{
+		ID:         r.Id.String(),
+		ScenarioID: r.ScenarioID.String(),
+		Status:     r.Status.String(),
+		Parameters: r.Parameters,
+		StartedAt:  &startedAt,
+		FinishedAt: &finishedAt,
+		CreatedAt:  FormatTimestamp(r.CreatedAt.Time()),
+	}
 }
 
-func ToCreateRunResponse(run *run.Run) *commands.CreateRunResponse {
+type RunCreateMapper struct{}
+
+func (m RunCreateMapper) Map(r *run.Run) *commands.CreateRunResponse {
+	dto := buildRunDTO(r)
 	response := &commands.CreateRunResponse{}
-	response.Body.ID = run.Id.String()
-	response.Body.ScenarioID = run.ScenarioID.String()
-	response.Body.Status = run.Status.String()
-	response.Body.Parameters = run.Parameters
-	response.Body.CreatedAt = run.CreatedAt.Time().Format("2006-01-02T15:04:05Z")
-
+	response.Body.ID = dto.ID
+	response.Body.ScenarioID = dto.ScenarioID
+	response.Body.Status = dto.Status
+	response.Body.CreatedAt = dto.CreatedAt
 	return response
 }
 
-func toRunListItem(run *run.Run) *queries.RunListItem {
-	item := &queries.RunListItem{}
+type RunStartMapper struct{}
 
-	item.ID = run.Id.String()
-	item.ScenarioID = run.ScenarioID.String()
-	item.Status = run.Status.String()
-	item.Parameters = run.Parameters
-	item.CreatedAt = run.CreatedAt.Time().Format("2006-01-02T15:04:05Z")
-
-	if run.StartedAt != nil {
-		startedAt := run.StartedAt.Time().Format("2006-01-02T15:04:05Z")
-		item.StartedAt = &startedAt
+func (m RunStartMapper) Map(r *run.Run) *commands.StartRunResponse {
+	dto := buildRunDTO(r)
+	response := &commands.StartRunResponse{}
+	response.Body.ID = dto.ID
+	response.Body.Status = dto.Status
+	if dto.StartedAt != nil {
+		response.Body.StartedAt = *dto.StartedAt
 	}
-	if run.FinishedAt != nil {
-		finishedAt := run.FinishedAt.Time().Format("2006-01-02T15:04:05Z")
-		item.FinishedAt = &finishedAt
-	}
-
-	return item
+	return response
 }
 
-func ToListRunResponse(runs []*run.Run, page int, rpp int) *queries.ListRunsResponse {
+type RunGetMapper struct{}
+
+func (m RunGetMapper) Map(r *run.Run) *queries.GetRunResponse {
+	dto := buildRunDTO(r)
+	response := &queries.GetRunResponse{}
+	response.Body.ID = dto.ID
+	response.Body.ScenarioID = dto.ScenarioID
+	response.Body.Status = dto.Status
+	response.Body.Parameters = dto.Parameters
+	response.Body.StartedAt = dto.StartedAt
+	response.Body.FinishedAt = dto.FinishedAt
+	response.Body.CreatedAt = dto.CreatedAt
+	return response
+}
+
+type RunListMapper struct{}
+
+func (m RunListMapper) Map(runs []*run.Run) *queries.ListRunsResponse {
 	response := &queries.ListRunsResponse{}
+	response.Body.Data = MapSlicePtr(runs, buildRunDTO)
 	response.Body.Total = len(runs)
-	response.Body.Page = page
-	response.Body.RPP = rpp
-
-	response.Body.Data = make([]queries.RunListItem, len(runs))
-
-	for i, run := range runs {
-		response.Body.Data[i] = *toRunListItem(run)
-	}
-
+	response.Body.Page = 1
+	response.Body.RPP = len(runs)
 	return response
+}
+
+func ToCreateRunResponse(r *run.Run) *commands.CreateRunResponse {
+	return RunCreateMapper{}.Map(r)
+}
+
+func ToStartRunResponse(r *run.Run) *commands.StartRunResponse {
+	return RunStartMapper{}.Map(r)
+}
+
+func ToGetRunResponse(r *run.Run) *queries.GetRunResponse {
+	return RunGetMapper{}.Map(r)
+}
+
+func ToListRunsResponse(runs []*run.Run) *queries.ListRunsResponse {
+	return RunListMapper{}.Map(runs)
 }

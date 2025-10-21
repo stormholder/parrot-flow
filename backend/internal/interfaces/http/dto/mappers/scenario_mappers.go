@@ -6,70 +6,89 @@ import (
 	"parrotflow/internal/interfaces/http/dto/queries"
 )
 
-func ToGetScenarioResponse(scenario *scenario.Scenario) *queries.GetScenarioResponse {
-	response := &queries.GetScenarioResponse{}
-	response.Body.ID = scenario.Id.String()
-	response.Body.Name = scenario.Name
-	response.Body.Description = scenario.Description
-	response.Body.Tag = scenario.Tag
-	response.Body.Icon = scenario.Icon
-	response.Body.CreatedAt = scenario.CreatedAt.Time().Format("2006-01-02T15:04:05Z")
-	response.Body.UpdatedAt = scenario.UpdatedAt.Time().Format("2006-01-02T15:04:05Z")
-
-	return response
+func buildScenarioDTO(s *scenario.Scenario) queries.ScenarioResponseItem {
+	return queries.ScenarioResponseItem{
+		ID:          s.Id.String(),
+		Name:        s.Name,
+		Description: s.Description,
+		Tag:         s.Tag,
+		Icon:        s.Icon,
+		CreatedAt:   FormatTimestamp(s.CreatedAt.Time()),
+		UpdatedAt:   FormatTimestamp(s.UpdatedAt.Time()),
+	}
 }
 
-func ToCreateScenarioResponse(scenario *scenario.Scenario) *commands.CreateScenarioResponse {
+type ScenarioCreateMapper struct{}
+
+func (m ScenarioCreateMapper) Map(s *scenario.Scenario) *commands.CreateScenarioResponse {
+	dto := buildScenarioDTO(s)
 	response := &commands.CreateScenarioResponse{}
-	response.Body.ID = scenario.Id.String()
-	response.Body.Name = scenario.Name
-	response.Body.Description = scenario.Description
-	response.Body.Tag = scenario.Tag
-	response.Body.Icon = scenario.Icon
-	response.Body.CreatedAt = scenario.CreatedAt.Time().Format("2006-01-02T15:04:05Z")
-	response.Body.UpdatedAt = scenario.UpdatedAt.Time().Format("2006-01-02T15:04:05Z")
-
+	response.Body.ID = dto.ID
+	response.Body.Name = dto.Name
+	response.Body.Description = dto.Description
+	response.Body.Tag = dto.Tag
+	response.Body.Icon = dto.Icon
+	response.Body.CreatedAt = dto.CreatedAt
+	response.Body.UpdatedAt = dto.UpdatedAt
 	return response
 }
 
-func toScenarioListItem(scenario *scenario.Scenario) *queries.ScenarioResponseItem {
-	item := &queries.ScenarioResponseItem{}
+type ScenarioUpdateMapper struct{}
 
-	item.ID = scenario.Id.String()
-	item.Name = scenario.Name
-	item.Description = scenario.Description
-	item.Tag = scenario.Tag
-	item.Icon = scenario.Icon
-	item.CreatedAt = scenario.CreatedAt.Time().Format("2006-01-02T15:04:05Z")
-	item.UpdatedAt = scenario.UpdatedAt.Time().Format("2006-01-02T15:04:05Z")
+func (m ScenarioUpdateMapper) Map(s *scenario.Scenario) *commands.UpdateScenarioResponse {
+	dto := buildScenarioDTO(s)
+	response := &commands.UpdateScenarioResponse{}
+	response.Body.ID = dto.ID
+	response.Body.Name = dto.Name
+	response.Body.Description = dto.Description
+	response.Body.Tag = dto.Tag
+	response.Body.Icon = dto.Icon
+	response.Body.UpdatedAt = dto.UpdatedAt
+	return response
+}
 
-	return item
+type ScenarioDeleteMapper struct{}
+
+func (m ScenarioDeleteMapper) Map() *commands.DeleteScenarioResponse {
+	response := &commands.DeleteScenarioResponse{}
+	response.Body.Success = true
+	return response
+}
+
+type ScenarioGetMapper struct{}
+
+func (m ScenarioGetMapper) Map(s *scenario.Scenario) *queries.GetScenarioResponse {
+	response := &queries.GetScenarioResponse{}
+	response.Body = buildScenarioDTO(s)
+	return response
+}
+
+type ScenarioListMapper struct {
+	Page int
+	RPP  int
+}
+
+func (m ScenarioListMapper) Map(scenarios []*scenario.Scenario) *queries.ListScenariosResponse {
+	response := &queries.ListScenariosResponse{}
+	response.Body.Total = len(scenarios)
+	response.Body.Page = m.Page
+	response.Body.RPP = m.RPP
+	response.Body.Data = MapSlicePtr(scenarios, buildScenarioDTO)
+	return response
+}
+
+func ToCreateScenarioResponse(s *scenario.Scenario) *commands.CreateScenarioResponse {
+	return ScenarioCreateMapper{}.Map(s)
+}
+
+func ToScenarioUpdateResponse(s *scenario.Scenario) *commands.UpdateScenarioResponse {
+	return ScenarioUpdateMapper{}.Map(s)
+}
+
+func ToGetScenarioResponse(s *scenario.Scenario) *queries.GetScenarioResponse {
+	return ScenarioGetMapper{}.Map(s)
 }
 
 func ToListScenarioResponse(scenarios []*scenario.Scenario, page int, rpp int) *queries.ListScenariosResponse {
-
-	response := &queries.ListScenariosResponse{}
-	response.Body.Total = len(scenarios)
-	response.Body.Page = page
-	response.Body.RPP = rpp
-
-	response.Body.Data = make([]queries.ScenarioResponseItem, len(scenarios))
-
-	for i, scenario := range scenarios {
-		response.Body.Data[i] = *toScenarioListItem(scenario)
-	}
-
-	return response
-}
-
-func ToScenarioUpdateResponse(scenario *scenario.Scenario) *commands.UpdateScenarioResponse {
-	response := &commands.UpdateScenarioResponse{}
-	response.Body.ID = scenario.Id.String()
-	response.Body.Name = scenario.Name
-	response.Body.Description = scenario.Description
-	response.Body.Tag = scenario.Tag
-	response.Body.Icon = scenario.Icon
-	response.Body.UpdatedAt = scenario.UpdatedAt.Time().Format("2006-01-02T15:04:05Z")
-
-	return response
+	return ScenarioListMapper{Page: page, RPP: rpp}.Map(scenarios)
 }
