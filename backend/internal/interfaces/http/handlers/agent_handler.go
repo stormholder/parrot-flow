@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"time"
 
 	agentcommand "parrotflow/internal/application/command/agent"
@@ -16,19 +14,31 @@ import (
 )
 
 type AgentHandler struct {
-	// Command handlers
-	registerCommandHandler     *agentcommand.RegisterAgentCommandHandler
+	// Commands
+	registerCommandHandler       *agentcommand.RegisterAgentCommandHandler
 	updateHeartbeatCommandHandler *agentcommand.UpdateHeartbeatCommandHandler
-	assignRunCommandHandler    *agentcommand.AssignRunCommandHandler
-	releaseRunCommandHandler   *agentcommand.ReleaseRunCommandHandler
-	updateCommandHandler       *agentcommand.UpdateAgentCommandHandler
-	deregisterCommandHandler   *agentcommand.DeregisterAgentCommandHandler
+	assignRunCommandHandler      *agentcommand.AssignRunCommandHandler
+	releaseRunCommandHandler     *agentcommand.ReleaseRunCommandHandler
+	updateCommandHandler         *agentcommand.UpdateAgentCommandHandler
+	deregisterCommandHandler     *agentcommand.DeregisterAgentCommandHandler
 
-	// Query handlers
-	getQueryHandler            *agentquery.GetAgentQueryHandler
-	listQueryHandler           *agentquery.ListAgentsQueryHandler
-	getAvailableQueryHandler   *agentquery.GetAvailableAgentsQueryHandler
-	getStaleQueryHandler       *agentquery.GetStaleAgentsQueryHandler
+	// Queries
+	getQueryHandler          *agentquery.GetAgentQueryHandler
+	listQueryHandler         *agentquery.ListAgentsQueryHandler
+	getAvailableQueryHandler *agentquery.GetAvailableAgentsQueryHandler
+	getStaleQueryHandler     *agentquery.GetStaleAgentsQueryHandler
+
+	// Mappers
+	registerMapper       mappers.AgentRegisterMapper
+	heartbeatMapper      mappers.AgentHeartbeatMapper
+	assignRunMapper      mappers.AgentAssignRunMapper
+	releaseRunMapper     mappers.AgentReleaseRunMapper
+	updateMapper         mappers.AgentUpdateMapper
+	deregisterMapper     mappers.AgentDeregisterMapper
+	getMapper            mappers.AgentGetMapper
+	listMapper           mappers.AgentListMapper
+	availableListMapper  mappers.AgentAvailableListMapper
+	staleListMapper      mappers.AgentStaleListMapper
 }
 
 func NewAgentHandler(
@@ -44,321 +54,235 @@ func NewAgentHandler(
 	getStaleQueryHandler *agentquery.GetStaleAgentsQueryHandler,
 ) *AgentHandler {
 	return &AgentHandler{
-		registerCommandHandler:     registerCommandHandler,
+		registerCommandHandler:       registerCommandHandler,
 		updateHeartbeatCommandHandler: updateHeartbeatCommandHandler,
-		assignRunCommandHandler:    assignRunCommandHandler,
-		releaseRunCommandHandler:   releaseRunCommandHandler,
-		updateCommandHandler:       updateCommandHandler,
-		deregisterCommandHandler:   deregisterCommandHandler,
-		getQueryHandler:            getQueryHandler,
-		listQueryHandler:           listQueryHandler,
-		getAvailableQueryHandler:   getAvailableQueryHandler,
-		getStaleQueryHandler:       getStaleQueryHandler,
+		assignRunCommandHandler:      assignRunCommandHandler,
+		releaseRunCommandHandler:     releaseRunCommandHandler,
+		updateCommandHandler:         updateCommandHandler,
+		deregisterCommandHandler:     deregisterCommandHandler,
+		getQueryHandler:              getQueryHandler,
+		listQueryHandler:             listQueryHandler,
+		getAvailableQueryHandler:     getAvailableQueryHandler,
+		getStaleQueryHandler:         getStaleQueryHandler,
+		registerMapper:               mappers.AgentRegisterMapper{},
+		heartbeatMapper:              mappers.AgentHeartbeatMapper{},
+		assignRunMapper:              mappers.AgentAssignRunMapper{},
+		releaseRunMapper:             mappers.AgentReleaseRunMapper{},
+		updateMapper:                 mappers.AgentUpdateMapper{},
+		deregisterMapper:             mappers.AgentDeregisterMapper{},
+		getMapper:                    mappers.AgentGetMapper{},
+		listMapper:                   mappers.AgentListMapper{},
+		availableListMapper:          mappers.AgentAvailableListMapper{},
+		staleListMapper:              mappers.AgentStaleListMapper{},
 	}
 }
 
-// RegisterAgent handles agent registration
-func (h *AgentHandler) RegisterAgent(ctx context.Context, input *commands.RegisterAgentRequest) (*commands.RegisterAgentResponse, error) {
-	// Convert DTOs to domain objects
-	capabilities, err := mappers.FromCapabilitiesDTO(input.Body.Capabilities)
-	if err != nil {
-		return nil, fmt.Errorf("invalid capabilities: %w", err)
-	}
-
-	connectionInfo, err := mappers.FromConnectionInfoDTO(input.Body.ConnectionInfo)
-	if err != nil {
-		return nil, fmt.Errorf("invalid connection info: %w", err)
-	}
-
-	// Create command
-	cmd := agentcommand.RegisterAgentCommand{
-		Name:           input.Body.Name,
-		Capabilities:   capabilities,
-		ConnectionInfo: connectionInfo,
-	}
-
-	// Execute command
-	a, err := h.registerCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to response
-	return mappers.ToRegisterAgentResponse(a), nil
-}
-
-// UpdateHeartbeat handles agent heartbeat updates
-func (h *AgentHandler) UpdateHeartbeat(ctx context.Context, input *commands.UpdateHeartbeatRequest) (*commands.UpdateHeartbeatResponse, error) {
-	// Parse agent ID
-	agentID, err := agent.NewAgentID(input.ID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid agent ID: %w", err)
-	}
-
-	// Create command
-	cmd := agentcommand.UpdateHeartbeatCommand{
-		AgentID: agentID,
-	}
-
-	// Execute command
-	a, err := h.updateHeartbeatCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to response
-	return mappers.ToUpdateHeartbeatResponse(a), nil
-}
-
-// AssignRun handles assigning a run to an agent
-func (h *AgentHandler) AssignRun(ctx context.Context, input *commands.AssignRunRequest) (*commands.AssignRunResponse, error) {
-	// Parse agent ID
-	agentID, err := agent.NewAgentID(input.ID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid agent ID: %w", err)
-	}
-
-	// Create command
-	cmd := agentcommand.AssignRunCommand{
-		AgentID: agentID,
-	}
-
-	// Execute command
-	a, err := h.assignRunCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to response
-	return mappers.ToAssignRunResponse(a), nil
-}
-
-// ReleaseRun handles releasing a run from an agent
-func (h *AgentHandler) ReleaseRun(ctx context.Context, input *commands.ReleaseRunRequest) (*commands.ReleaseRunResponse, error) {
-	// Parse agent ID
-	agentID, err := agent.NewAgentID(input.ID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid agent ID: %w", err)
-	}
-
-	// Create command
-	cmd := agentcommand.ReleaseRunCommand{
-		AgentID: agentID,
-	}
-
-	// Execute command
-	a, err := h.releaseRunCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to response
-	return mappers.ToReleaseRunResponse(a), nil
-}
-
-// UpdateAgent handles agent updates
-func (h *AgentHandler) UpdateAgent(ctx context.Context, input *commands.UpdateAgentRequest) (*commands.UpdateAgentResponse, error) {
-	// Parse agent ID
-	agentID, err := agent.NewAgentID(input.ID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid agent ID: %w", err)
-	}
-
-	// Create command
-	cmd := agentcommand.UpdateAgentCommand{
-		AgentID: agentID,
-		Name:    input.Body.Name,
-	}
-
-	// Convert capabilities if provided
-	if input.Body.Capabilities != nil {
-		capabilities, err := mappers.FromCapabilitiesDTO(*input.Body.Capabilities)
-		if err != nil {
-			return nil, fmt.Errorf("invalid capabilities: %w", err)
-		}
-		cmd.Capabilities = &capabilities
-	}
-
-	// Convert tag IDs to add
-	if len(input.Body.TagsToAdd) > 0 {
-		cmd.TagsToAdd = make([]tag.TagID, len(input.Body.TagsToAdd))
-		for i, tagIDStr := range input.Body.TagsToAdd {
-			tagID, err := tag.NewTagID(tagIDStr)
+func (h *AgentHandler) RegisterAgent(ctx context.Context, req *commands.RegisterAgentRequest) (*commands.RegisterAgentResponse, error) {
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.RegisterAgentRequest) (agentcommand.RegisterAgentCommand, error) {
+			capabilities, err := mappers.FromCapabilitiesDTO(r.Body.Capabilities)
 			if err != nil {
-				return nil, fmt.Errorf("invalid tag ID: %w", err)
+				return agentcommand.RegisterAgentCommand{}, err
 			}
-			cmd.TagsToAdd[i] = tagID
-		}
-	}
 
-	// Convert tag IDs to remove
-	if len(input.Body.TagsToRemove) > 0 {
-		cmd.TagsToRemove = make([]tag.TagID, len(input.Body.TagsToRemove))
-		for i, tagIDStr := range input.Body.TagsToRemove {
-			tagID, err := tag.NewTagID(tagIDStr)
+			connectionInfo, err := mappers.FromConnectionInfoDTO(r.Body.ConnectionInfo)
 			if err != nil {
-				return nil, fmt.Errorf("invalid tag ID: %w", err)
+				return agentcommand.RegisterAgentCommand{}, err
 			}
-			cmd.TagsToRemove[i] = tagID
-		}
-	}
 
-	// Execute command
-	a, err := h.updateCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to response
-	return mappers.ToUpdateAgentResponse(a), nil
+			return agentcommand.RegisterAgentCommand{
+				Name:           r.Body.Name,
+				Capabilities:   capabilities,
+				ConnectionInfo: connectionInfo,
+			}, nil
+		},
+		CommandHandlerFunc[agentcommand.RegisterAgentCommand, *agent.Agent](h.registerCommandHandler.Handle),
+		h.registerMapper,
+	)
 }
 
-// DeregisterAgent handles agent deregistration
-func (h *AgentHandler) DeregisterAgent(ctx context.Context, input *commands.DeregisterAgentRequest) (*commands.DeregisterAgentResponse, error) {
-	// Parse agent ID
-	agentID, err := agent.NewAgentID(input.ID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid agent ID: %w", err)
-	}
-
-	// Create command
-	cmd := agentcommand.DeregisterAgentCommand{
-		AgentID: agentID,
-	}
-
-	// Execute command
-	if err := h.deregisterCommandHandler.Handle(ctx, cmd); err != nil {
-		return nil, err
-	}
-
-	// Convert to response
-	return mappers.ToDeregisterAgentResponse(), nil
-}
-
-// GetAgent handles getting a single agent by ID
-func (h *AgentHandler) GetAgent(ctx context.Context, input *queries.GetAgentRequest) (*queries.GetAgentResponse, error) {
-	// Parse agent ID
-	agentID, err := agent.NewAgentID(input.ID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid agent ID: %w", err)
-	}
-
-	// Create query
-	query := agentquery.GetAgentQuery{
-		ID: agentID,
-	}
-
-	// Execute query
-	a, err := h.getQueryHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	if a == nil {
-		return nil, agent.ErrAgentNotFound
-	}
-
-	// Convert to response
-	return mappers.ToGetAgentResponse(a), nil
-}
-
-// ListAgents handles listing agents with optional filters
-func (h *AgentHandler) ListAgents(ctx context.Context, input *queries.ListAgentsRequest) (*queries.ListAgentsResponse, error) {
-	// Create query
-	query := agentquery.ListAgentsQuery{
-		HeartbeatTimeout: 5 * time.Minute, // Default timeout
-		OnlyHealthy:      input.OnlyHealthy,
-	}
-
-	// Convert empty strings to nil pointers for optional filters
-	if input.Status != "" {
-		query.Status = &input.Status
-	}
-	if input.BrowserType != "" {
-		query.BrowserType = &input.BrowserType
-	}
-	if input.Platform != "" {
-		query.Platform = &input.Platform
-	}
-
-	// Parse tag IDs if provided
-	if input.TagIDs != "" {
-		tagIDStrings := strings.Split(input.TagIDs, ",")
-		query.TagIDs = make([]tag.TagID, len(tagIDStrings))
-		for i, tagIDStr := range tagIDStrings {
-			tagID, err := tag.NewTagID(strings.TrimSpace(tagIDStr))
+func (h *AgentHandler) UpdateHeartbeat(ctx context.Context, req *commands.UpdateHeartbeatRequest) (*commands.UpdateHeartbeatResponse, error) {
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.UpdateHeartbeatRequest) (agentcommand.UpdateHeartbeatCommand, error) {
+			agentID, err := agent.NewAgentID(r.ID)
 			if err != nil {
-				return nil, fmt.Errorf("invalid tag ID: %w", err)
+				return agentcommand.UpdateHeartbeatCommand{}, err
 			}
-			query.TagIDs[i] = tagID
-		}
-	}
-
-	// Execute query
-	agents, err := h.listQueryHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to response
-	return mappers.ToListAgentsResponse(agents), nil
+			return agentcommand.UpdateHeartbeatCommand{AgentID: agentID}, nil
+		},
+		CommandHandlerFunc[agentcommand.UpdateHeartbeatCommand, *agent.Agent](h.updateHeartbeatCommandHandler.Handle),
+		h.heartbeatMapper,
+	)
 }
 
-// GetAvailableAgents handles getting available agents with optional filters
-func (h *AgentHandler) GetAvailableAgents(ctx context.Context, input *queries.GetAvailableAgentsRequest) (*queries.GetAvailableAgentsResponse, error) {
-	// Create query
-	query := agentquery.GetAvailableAgentsQuery{}
-
-	// Convert empty strings to nil pointers for optional filters
-	if input.BrowserType != "" {
-		query.BrowserType = &input.BrowserType
-	}
-	if input.Platform != "" {
-		query.Platform = &input.Platform
-	}
-
-	// Parse tag IDs if provided
-	if input.TagIDs != "" {
-		tagIDStrings := strings.Split(input.TagIDs, ",")
-		query.TagIDs = make([]tag.TagID, len(tagIDStrings))
-		for i, tagIDStr := range tagIDStrings {
-			tagID, err := tag.NewTagID(strings.TrimSpace(tagIDStr))
+func (h *AgentHandler) AssignRun(ctx context.Context, req *commands.AssignRunRequest) (*commands.AssignRunResponse, error) {
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.AssignRunRequest) (agentcommand.AssignRunCommand, error) {
+			agentID, err := agent.NewAgentID(r.ID)
 			if err != nil {
-				return nil, fmt.Errorf("invalid tag ID: %w", err)
+				return agentcommand.AssignRunCommand{}, err
 			}
-			query.TagIDs[i] = tagID
-		}
-	}
-
-	// Execute query
-	agents, err := h.getAvailableQueryHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to response
-	return mappers.ToGetAvailableAgentsResponse(agents), nil
+			return agentcommand.AssignRunCommand{AgentID: agentID}, nil
+		},
+		CommandHandlerFunc[agentcommand.AssignRunCommand, *agent.Agent](h.assignRunCommandHandler.Handle),
+		h.assignRunMapper,
+	)
 }
 
-// GetStaleAgents handles getting stale agents
-func (h *AgentHandler) GetStaleAgents(ctx context.Context, input *queries.GetStaleAgentsRequest) (*queries.GetStaleAgentsResponse, error) {
-	// Determine heartbeat timeout (use provided value or default to 5)
-	timeoutMinutes := input.HeartbeatTimeoutMinutes
-	if timeoutMinutes == 0 {
-		timeoutMinutes = 5 // default
-	}
+func (h *AgentHandler) ReleaseRun(ctx context.Context, req *commands.ReleaseRunRequest) (*commands.ReleaseRunResponse, error) {
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.ReleaseRunRequest) (agentcommand.ReleaseRunCommand, error) {
+			agentID, err := agent.NewAgentID(r.ID)
+			if err != nil {
+				return agentcommand.ReleaseRunCommand{}, err
+			}
+			return agentcommand.ReleaseRunCommand{AgentID: agentID}, nil
+		},
+		CommandHandlerFunc[agentcommand.ReleaseRunCommand, *agent.Agent](h.releaseRunCommandHandler.Handle),
+		h.releaseRunMapper,
+	)
+}
 
-	// Create query
-	query := agentquery.GetStaleAgentsQuery{
-		HeartbeatTimeout: time.Duration(timeoutMinutes) * time.Minute,
-	}
+func (h *AgentHandler) UpdateAgent(ctx context.Context, req *commands.UpdateAgentRequest) (*commands.UpdateAgentResponse, error) {
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.UpdateAgentRequest) (agentcommand.UpdateAgentCommand, error) {
+			agentID, err := agent.NewAgentID(r.ID)
+			if err != nil {
+				return agentcommand.UpdateAgentCommand{}, err
+			}
 
-	// Execute query
-	agents, err := h.getStaleQueryHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
+			var capabilities *agent.Capabilities
+			if r.Body.Capabilities != nil {
+				caps, err := mappers.FromCapabilitiesDTO(*r.Body.Capabilities)
+				if err != nil {
+					return agentcommand.UpdateAgentCommand{}, err
+				}
+				capabilities = &caps
+			}
 
-	// Convert to response
-	return mappers.ToGetStaleAgentsResponse(agents), nil
+			var tagsToAdd []tag.TagID
+			if len(r.Body.TagsToAdd) > 0 {
+				tagsToAdd = make([]tag.TagID, len(r.Body.TagsToAdd))
+				for i, idStr := range r.Body.TagsToAdd {
+					tagID, err := tag.NewTagID(idStr)
+					if err != nil {
+						return agentcommand.UpdateAgentCommand{}, err
+					}
+					tagsToAdd[i] = tagID
+				}
+			}
+
+			var tagsToRemove []tag.TagID
+			if len(r.Body.TagsToRemove) > 0 {
+				tagsToRemove = make([]tag.TagID, len(r.Body.TagsToRemove))
+				for i, idStr := range r.Body.TagsToRemove {
+					tagID, err := tag.NewTagID(idStr)
+					if err != nil {
+						return agentcommand.UpdateAgentCommand{}, err
+					}
+					tagsToRemove[i] = tagID
+				}
+			}
+
+			return agentcommand.UpdateAgentCommand{
+				AgentID:      agentID,
+				Name:         r.Body.Name,
+				Capabilities: capabilities,
+				TagsToAdd:    tagsToAdd,
+				TagsToRemove: tagsToRemove,
+			}, nil
+		},
+		CommandHandlerFunc[agentcommand.UpdateAgentCommand, *agent.Agent](h.updateCommandHandler.Handle),
+		h.updateMapper,
+	)
+}
+
+func (h *AgentHandler) DeregisterAgent(ctx context.Context, req *commands.DeregisterAgentRequest) (*commands.DeregisterAgentResponse, error) {
+	return HandleSimpleCommand(
+		ctx,
+		req,
+		func(r *commands.DeregisterAgentRequest) (agentcommand.DeregisterAgentCommand, error) {
+			agentID, err := agent.NewAgentID(r.ID)
+			if err != nil {
+				return agentcommand.DeregisterAgentCommand{}, err
+			}
+			return agentcommand.DeregisterAgentCommand{AgentID: agentID}, nil
+		},
+		SimpleCommandHandlerFunc[agentcommand.DeregisterAgentCommand](h.deregisterCommandHandler.Handle),
+		h.deregisterMapper.Map,
+	)
+}
+
+func (h *AgentHandler) GetAgent(ctx context.Context, req *queries.GetAgentRequest) (*queries.GetAgentResponse, error) {
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.GetAgentRequest) (agentquery.GetAgentQuery, error) {
+			agentID, err := agent.NewAgentID(r.ID)
+			if err != nil {
+				return agentquery.GetAgentQuery{}, err
+			}
+			return agentquery.GetAgentQuery{ID: agentID}, nil
+		},
+		QueryHandlerFunc[agentquery.GetAgentQuery, *agent.Agent](h.getQueryHandler.Handle),
+		h.getMapper,
+	)
+}
+
+func (h *AgentHandler) ListAgents(ctx context.Context, req *queries.ListAgentsRequest) (*queries.ListAgentsResponse, error) {
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.ListAgentsRequest) (agentquery.ListAgentsQuery, error) {
+			q := agentquery.ListAgentsQuery{}
+
+			if r.Status != "" {
+				q.Status = &r.Status
+			}
+
+			// Note: TagIDs is a string in the request, needs parsing if we want to use it
+			// For now, we'll leave it empty
+			return q, nil
+		},
+		QueryHandlerFunc[agentquery.ListAgentsQuery, []*agent.Agent](h.listQueryHandler.Handle),
+		h.listMapper,
+	)
+}
+
+func (h *AgentHandler) GetAvailableAgents(ctx context.Context, req *queries.GetAvailableAgentsRequest) (*queries.GetAvailableAgentsResponse, error) {
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.GetAvailableAgentsRequest) (agentquery.GetAvailableAgentsQuery, error) {
+			return agentquery.GetAvailableAgentsQuery{}, nil
+		},
+		QueryHandlerFunc[agentquery.GetAvailableAgentsQuery, []*agent.Agent](h.getAvailableQueryHandler.Handle),
+		h.availableListMapper,
+	)
+}
+
+func (h *AgentHandler) GetStaleAgents(ctx context.Context, req *queries.GetStaleAgentsRequest) (*queries.GetStaleAgentsResponse, error) {
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.GetStaleAgentsRequest) (agentquery.GetStaleAgentsQuery, error) {
+			timeout := 5 * time.Minute
+			if r.HeartbeatTimeoutMinutes > 0 {
+				timeout = time.Duration(r.HeartbeatTimeoutMinutes) * time.Minute
+			}
+			return agentquery.GetStaleAgentsQuery{HeartbeatTimeout: timeout}, nil
+		},
+		QueryHandlerFunc[agentquery.GetStaleAgentsQuery, []*agent.Agent](h.getStaleQueryHandler.Handle),
+		h.staleListMapper,
+	)
 }
