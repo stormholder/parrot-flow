@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"context"
-	commandRun "parrotflow/internal/application/command/run"
-	queryRun "parrotflow/internal/application/query/run"
+
+	command "parrotflow/internal/application/command/run"
+	query "parrotflow/internal/application/query/run"
 	"parrotflow/internal/domain/run"
 	"parrotflow/internal/domain/scenario"
 	"parrotflow/internal/interfaces/http/dto/commands"
@@ -12,118 +13,99 @@ import (
 )
 
 type RunHandler struct {
-	createCommandHandler *commandRun.CreateRunCommandHandler
-	startCommandHandler  *commandRun.StartRunCommandHandler
-	getQueryHandler      *queryRun.GetRunQueryHandler
-	listQueryHandler     *queryRun.ListRunsQueryHandler
+	createCommandHandler *command.CreateRunCommandHandler
+	startCommandHandler  *command.StartRunCommandHandler
+	getQueryHandler      *query.GetRunQueryHandler
+	listQueryHandler     *query.ListRunsQueryHandler
+
+	createMapper mappers.RunCreateMapper
+	startMapper  mappers.RunStartMapper
+	getMapper    mappers.RunGetMapper
+	listMapper   mappers.RunListMapper
 }
 
 func NewRunHandler(
-	createCommandHandler *commandRun.CreateRunCommandHandler,
-	startCommandHandler *commandRun.StartRunCommandHandler,
-	getQueryHandler *queryRun.GetRunQueryHandler,
-	listQueryHandler *queryRun.ListRunsQueryHandler,
+	createCommandHandler *command.CreateRunCommandHandler,
+	startCommandHandler *command.StartRunCommandHandler,
+	getQueryHandler *query.GetRunQueryHandler,
+	listQueryHandler *query.ListRunsQueryHandler,
 ) *RunHandler {
 	return &RunHandler{
 		createCommandHandler: createCommandHandler,
 		startCommandHandler:  startCommandHandler,
 		getQueryHandler:      getQueryHandler,
 		listQueryHandler:     listQueryHandler,
+		createMapper:         mappers.RunCreateMapper{},
+		startMapper:          mappers.RunStartMapper{},
+		getMapper:            mappers.RunGetMapper{},
+		listMapper:           mappers.RunListMapper{},
 	}
 }
 
 func (h *RunHandler) CreateRun(ctx context.Context, req *commands.CreateRunRequest) (*commands.CreateRunResponse, error) {
-	scenarioID, err := scenario.NewScenarioID(req.Body.ScenarioID)
-	if err != nil {
-		return nil, err
-	}
-
-	cmd := commandRun.CreateRunCommand{
-		ScenarioID: scenarioID,
-		Parameters: req.Body.Parameters,
-	}
-
-	run, err := h.createCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	response := mappers.ToCreateRunResponse(run)
-
-	return response, nil
-}
-
-func (h *RunHandler) GetRun(ctx context.Context, req *queries.GetRunRequest) (*queries.GetRunResponse, error) {
-	runID, err := run.NewRunID(req.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	query := queryRun.GetRunQuery{
-		ID: runID,
-	}
-
-	run, err := h.getQueryHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	response := mappers.ToGetRunResponse(run)
-
-	return response, nil
-}
-
-func (h *RunHandler) ListRuns(ctx context.Context, req *queries.ListRunsRequest) (*queries.ListRunsResponse, error) {
-	criteria := run.NewSearchCriteria()
-	if req.ScenarioID != "" {
-		scenarioID, err := scenario.NewScenarioID(req.ScenarioID)
-		if err != nil {
-			return nil, err
-		}
-		criteria = criteria.WithScenarioID(scenarioID)
-	}
-	if req.Status != "" {
-		criteria = criteria.WithStatus(req.Status)
-	}
-	if req.Page > 0 {
-		criteria = criteria.WithPagination(req.RPP, (req.Page-1)*req.RPP)
-	}
-
-	query := queryRun.ListRunsQuery{
-		Criteria: criteria,
-	}
-
-	runs, err := h.listQueryHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	response := mappers.ToListRunResponse(runs, req.Page, req.RPP)
-
-	return response, nil
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.CreateRunRequest) (command.CreateRunCommand, error) {
+			scenarioID, err := scenario.NewScenarioID(r.Body.ScenarioID)
+			if err != nil {
+				return command.CreateRunCommand{}, err
+			}
+			return command.CreateRunCommand{ScenarioID: scenarioID}, nil
+		},
+		CommandHandlerFunc[command.CreateRunCommand, *run.Run](h.createCommandHandler.Handle),
+		h.createMapper,
+	)
 }
 
 func (h *RunHandler) StartRun(ctx context.Context, req *commands.StartRunRequest) (*commands.StartRunResponse, error) {
-	runID, err := run.NewRunID(req.ID)
-	if err != nil {
-		return nil, err
-	}
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.StartRunRequest) (command.StartRunCommand, error) {
+			runID, err := run.NewRunID(r.ID)
+			if err != nil {
+				return command.StartRunCommand{}, err
+			}
+			return command.StartRunCommand{RunID: runID}, nil
+		},
+		CommandHandlerFunc[command.StartRunCommand, *run.Run](h.startCommandHandler.Handle),
+		h.startMapper,
+	)
+}
 
-	cmd := commandRun.StartRunCommand{
-		RunID: runID,
-	}
+func (h *RunHandler) GetRun(ctx context.Context, req *queries.GetRunRequest) (*queries.GetRunResponse, error) {
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.GetRunRequest) (query.GetRunQuery, error) {
+			runID, err := run.NewRunID(r.ID)
+			if err != nil {
+				return query.GetRunQuery{}, err
+			}
+			return query.GetRunQuery{ID: runID}, nil
+		},
+		QueryHandlerFunc[query.GetRunQuery, *run.Run](h.getQueryHandler.Handle),
+		h.getMapper,
+	)
+}
 
-	run, err := h.startCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	response := &commands.StartRunResponse{}
-	response.Body.ID = run.Id.String()
-	response.Body.Status = run.Status.String()
-	if run.StartedAt != nil {
-		response.Body.StartedAt = run.StartedAt.Time().Format("2006-01-02T15:04:05Z")
-	}
-
-	return response, nil
+func (h *RunHandler) ListRuns(ctx context.Context, req *queries.ListRunsRequest) (*queries.ListRunsResponse, error) {
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.ListRunsRequest) (query.ListRunsQuery, error) {
+			criteria := run.NewSearchCriteria()
+			if r.ScenarioID != "" {
+				scenarioID, err := scenario.NewScenarioID(r.ScenarioID)
+				if err != nil {
+					return query.ListRunsQuery{}, err
+				}
+				criteria.ScenarioID = scenarioID
+			}
+			return query.ListRunsQuery{Criteria: criteria}, nil
+		},
+		QueryHandlerFunc[query.ListRunsQuery, []*run.Run](h.listQueryHandler.Handle),
+		h.listMapper,
+	)
 }
