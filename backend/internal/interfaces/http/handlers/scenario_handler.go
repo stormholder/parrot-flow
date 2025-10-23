@@ -103,13 +103,30 @@ func (h *ScenarioHandler) UpdateScenario(ctx context.Context, req *commands.Upda
 			if err != nil {
 				return command.UpdateScenarioCommand{}, err
 			}
-			return command.UpdateScenarioCommand{
+
+			cmd := command.UpdateScenarioCommand{
 				ID:          scenarioID,
 				Name:        r.Body.Name,
 				Description: r.Body.Description,
 				Tag:         r.Body.Tag,
 				Icon:        r.Body.Icon,
-			}, nil
+			}
+
+			// Map value objects if provided
+			if r.Body.Context != nil {
+				ctx := mappers.MapContextFromDTO(*r.Body.Context)
+				cmd.Context = &ctx
+			}
+			if r.Body.InputData != nil {
+				inputData := mappers.MapInputDataFromDTO(*r.Body.InputData)
+				cmd.InputData = &inputData
+			}
+			if r.Body.Parameters != nil {
+				params := mappers.MapParametersFromDTO(*r.Body.Parameters)
+				cmd.Parameters = &params
+			}
+
+			return cmd, nil
 		},
 		CommandHandlerFunc[command.UpdateScenarioCommand, *scenario.Scenario](h.updateCommandHandler.Handle),
 		h.updateMapper,
