@@ -19,9 +19,9 @@ func buildTagDTO(t *tag.Tag) queries.TagDTO {
 	}
 }
 
-type TagCreateMapper struct{}
+// Mapper functions using functional approach instead of empty structs
 
-func (m TagCreateMapper) Map(t *tag.Tag) *commands.CreateTagResponse {
+func TagToCreateResponse(t *tag.Tag) *commands.CreateTagResponse {
 	dto := buildTagDTO(t)
 	response := &commands.CreateTagResponse{}
 	response.Body.ID = dto.ID
@@ -35,10 +35,7 @@ func (m TagCreateMapper) Map(t *tag.Tag) *commands.CreateTagResponse {
 	return response
 }
 
-// TagUpdateMapper maps Tag to UpdateTagResponse
-type TagUpdateMapper struct{}
-
-func (m TagUpdateMapper) Map(t *tag.Tag) *commands.UpdateTagResponse {
+func TagToUpdateResponse(t *tag.Tag) *commands.UpdateTagResponse {
 	dto := buildTagDTO(t)
 	response := &commands.UpdateTagResponse{}
 	response.Body.ID = dto.ID
@@ -51,42 +48,29 @@ func (m TagUpdateMapper) Map(t *tag.Tag) *commands.UpdateTagResponse {
 	return response
 }
 
-type TagDeleteMapper struct{}
-
-func (m TagDeleteMapper) Map() *commands.DeleteTagResponse {
+func TagToDeleteResponse() *commands.DeleteTagResponse {
 	response := &commands.DeleteTagResponse{}
 	response.Body.Success = true
 	return response
 }
 
-type TagGetMapper struct{}
-
-func (m TagGetMapper) Map(t *tag.Tag) *queries.GetTagResponse {
+func TagToGetResponse(t *tag.Tag) *queries.GetTagResponse {
 	response := &queries.GetTagResponse{}
 	response.Body = buildTagDTO(t)
 	return response
 }
 
-type TagListMapper struct{}
-
-func (m TagListMapper) Map(tags []*tag.Tag) *queries.ListTagsResponse {
+func TagToListResponse(tags []*tag.Tag) *queries.ListTagsResponse {
 	response := &queries.ListTagsResponse{}
 	response.Body.Tags = MapSlicePtr(tags, buildTagDTO)
 	return response
 }
 
-func ToCreateTagResponse(t *tag.Tag) *commands.CreateTagResponse {
-	return TagCreateMapper{}.Map(t)
-}
-
-func ToUpdateTagResponse(t *tag.Tag) *commands.UpdateTagResponse {
-	return TagUpdateMapper{}.Map(t)
-}
-
-func ToGetTagResponse(t *tag.Tag) *queries.GetTagResponse {
-	return TagGetMapper{}.Map(t)
-}
-
-func ToListTagsResponse(tags []*tag.Tag) *queries.ListTagsResponse {
-	return TagListMapper{}.Map(tags)
-}
+// Mapper instances for handler injection - using functional types
+var (
+	TagCreateMapper = CreateMapperFunc[*tag.Tag, *commands.CreateTagResponse](TagToCreateResponse)
+	TagUpdateMapper = UpdateMapperFunc[*tag.Tag, *commands.UpdateTagResponse](TagToUpdateResponse)
+	TagDeleteMapper = DeleteMapperFunc[*commands.DeleteTagResponse](TagToDeleteResponse)
+	TagGetMapper    = GetMapperFunc[*tag.Tag, *queries.GetTagResponse](TagToGetResponse)
+	TagListMapper   = ListMapperFunc[tag.Tag, *queries.ListTagsResponse](TagToListResponse)
+)

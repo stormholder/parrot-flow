@@ -277,62 +277,16 @@ func FromConnectionInfoDTO(dto commands.ConnectionInfoDTO) (agent.ConnectionInfo
 	return agent.NewConnectionInfo(dto.IPAddress, dto.Hostname, dto.QueueName)
 }
 
-type AgentRegisterMapper struct{}
-
-func (m AgentRegisterMapper) Map(a *agent.Agent) *commands.RegisterAgentResponse {
-	return ToRegisterAgentResponse(a)
-}
-
-type AgentHeartbeatMapper struct{}
-
-func (m AgentHeartbeatMapper) Map(a *agent.Agent) *commands.UpdateHeartbeatResponse {
-	return ToUpdateHeartbeatResponse(a)
-}
-
-type AgentAssignRunMapper struct{}
-
-func (m AgentAssignRunMapper) Map(a *agent.Agent) *commands.AssignRunResponse {
-	return ToAssignRunResponse(a)
-}
-
-type AgentReleaseRunMapper struct{}
-
-func (m AgentReleaseRunMapper) Map(a *agent.Agent) *commands.ReleaseRunResponse {
-	return ToReleaseRunResponse(a)
-}
-
-type AgentUpdateMapper struct{}
-
-func (m AgentUpdateMapper) Map(a *agent.Agent) *commands.UpdateAgentResponse {
-	return ToUpdateAgentResponse(a)
-}
-
-type AgentDeregisterMapper struct{}
-
-func (m AgentDeregisterMapper) Map() *commands.DeregisterAgentResponse {
-	return ToDeregisterAgentResponse()
-}
-
-type AgentGetMapper struct{}
-
-func (m AgentGetMapper) Map(a *agent.Agent) *queries.GetAgentResponse {
-	return ToGetAgentResponse(a)
-}
-
-type AgentListMapper struct{}
-
-func (m AgentListMapper) Map(agents []*agent.Agent) *queries.ListAgentsResponse {
-	return ToListAgentsResponse(agents)
-}
-
-type AgentAvailableListMapper struct{}
-
-func (m AgentAvailableListMapper) Map(agents []*agent.Agent) *queries.GetAvailableAgentsResponse {
-	return ToGetAvailableAgentsResponse(agents)
-}
-
-type AgentStaleListMapper struct{}
-
-func (m AgentStaleListMapper) Map(agents []*agent.Agent) *queries.GetStaleAgentsResponse {
-	return ToGetStaleAgentsResponse(agents)
-}
+// Mapper instances using functional types - eliminates empty struct boilerplate
+var (
+	AgentRegisterMapper       = CreateMapperFunc[*agent.Agent, *commands.RegisterAgentResponse](ToRegisterAgentResponse)
+	AgentHeartbeatMapper      = CreateMapperFunc[*agent.Agent, *commands.UpdateHeartbeatResponse](ToUpdateHeartbeatResponse)
+	AgentAssignRunMapper      = CreateMapperFunc[*agent.Agent, *commands.AssignRunResponse](ToAssignRunResponse)
+	AgentReleaseRunMapper     = CreateMapperFunc[*agent.Agent, *commands.ReleaseRunResponse](ToReleaseRunResponse)
+	AgentUpdateMapper         = UpdateMapperFunc[*agent.Agent, *commands.UpdateAgentResponse](ToUpdateAgentResponse)
+	AgentDeregisterMapper     = DeleteMapperFunc[*commands.DeregisterAgentResponse](ToDeregisterAgentResponse)
+	AgentGetMapper            = GetMapperFunc[*agent.Agent, *queries.GetAgentResponse](ToGetAgentResponse)
+	AgentListMapper           = ListMapperFunc[agent.Agent, *queries.ListAgentsResponse](ToListAgentsResponse)
+	AgentAvailableListMapper  = ListMapperFunc[agent.Agent, *queries.GetAvailableAgentsResponse](ToGetAvailableAgentsResponse)
+	AgentStaleListMapper      = ListMapperFunc[agent.Agent, *queries.GetStaleAgentsResponse](ToGetStaleAgentsResponse)
+)

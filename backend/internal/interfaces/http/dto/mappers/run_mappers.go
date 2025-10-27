@@ -27,9 +27,9 @@ func buildRunDTO(r *run.Run) queries.RunListItem {
 	}
 }
 
-type RunCreateMapper struct{}
+// Mapper functions using functional approach
 
-func (m RunCreateMapper) Map(r *run.Run) *commands.CreateRunResponse {
+func RunToCreateResponse(r *run.Run) *commands.CreateRunResponse {
 	dto := buildRunDTO(r)
 	response := &commands.CreateRunResponse{}
 	response.Body.ID = dto.ID
@@ -39,9 +39,7 @@ func (m RunCreateMapper) Map(r *run.Run) *commands.CreateRunResponse {
 	return response
 }
 
-type RunStartMapper struct{}
-
-func (m RunStartMapper) Map(r *run.Run) *commands.StartRunResponse {
+func RunToStartResponse(r *run.Run) *commands.StartRunResponse {
 	dto := buildRunDTO(r)
 	response := &commands.StartRunResponse{}
 	response.Body.ID = dto.ID
@@ -52,9 +50,7 @@ func (m RunStartMapper) Map(r *run.Run) *commands.StartRunResponse {
 	return response
 }
 
-type RunGetMapper struct{}
-
-func (m RunGetMapper) Map(r *run.Run) *queries.GetRunResponse {
+func RunToGetResponse(r *run.Run) *queries.GetRunResponse {
 	dto := buildRunDTO(r)
 	response := &queries.GetRunResponse{}
 	response.Body.ID = dto.ID
@@ -67,9 +63,7 @@ func (m RunGetMapper) Map(r *run.Run) *queries.GetRunResponse {
 	return response
 }
 
-type RunListMapper struct{}
-
-func (m RunListMapper) Map(runs []*run.Run) *queries.ListRunsResponse {
+func RunToListResponse(runs []*run.Run) *queries.ListRunsResponse {
 	response := &queries.ListRunsResponse{}
 	response.Body.Data = MapSlicePtr(runs, buildRunDTO)
 	response.Body.Total = len(runs)
@@ -78,18 +72,10 @@ func (m RunListMapper) Map(runs []*run.Run) *queries.ListRunsResponse {
 	return response
 }
 
-func ToCreateRunResponse(r *run.Run) *commands.CreateRunResponse {
-	return RunCreateMapper{}.Map(r)
-}
-
-func ToStartRunResponse(r *run.Run) *commands.StartRunResponse {
-	return RunStartMapper{}.Map(r)
-}
-
-func ToGetRunResponse(r *run.Run) *queries.GetRunResponse {
-	return RunGetMapper{}.Map(r)
-}
-
-func ToListRunsResponse(runs []*run.Run) *queries.ListRunsResponse {
-	return RunListMapper{}.Map(runs)
-}
+// Mapper instances for handler injection
+var (
+	RunCreateMapper = CreateMapperFunc[*run.Run, *commands.CreateRunResponse](RunToCreateResponse)
+	RunStartMapper  = CreateMapperFunc[*run.Run, *commands.StartRunResponse](RunToStartResponse)
+	RunGetMapper    = GetMapperFunc[*run.Run, *queries.GetRunResponse](RunToGetResponse)
+	RunListMapper   = ListMapperFunc[run.Run, *queries.ListRunsResponse](RunToListResponse)
+)

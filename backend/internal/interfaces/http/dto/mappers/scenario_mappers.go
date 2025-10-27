@@ -146,9 +146,9 @@ func mapParameterItemFromDTO(dto shared.ParameterItemDTO) scenario.ParameterItem
 	)
 }
 
-type ScenarioCreateMapper struct{}
+// Mapper functions using functional approach
 
-func (m ScenarioCreateMapper) Map(s *scenario.Scenario) *commands.CreateScenarioResponse {
+func ScenarioToCreateResponse(s *scenario.Scenario) *commands.CreateScenarioResponse {
 	dto := buildScenarioDTO(s)
 	response := &commands.CreateScenarioResponse{}
 	response.Body.ID = dto.ID
@@ -164,9 +164,7 @@ func (m ScenarioCreateMapper) Map(s *scenario.Scenario) *commands.CreateScenario
 	return response
 }
 
-type ScenarioUpdateMapper struct{}
-
-func (m ScenarioUpdateMapper) Map(s *scenario.Scenario) *commands.UpdateScenarioResponse {
+func ScenarioToUpdateResponse(s *scenario.Scenario) *commands.UpdateScenarioResponse {
 	dto := buildScenarioDTO(s)
 	response := &commands.UpdateScenarioResponse{}
 	response.Body.ID = dto.ID
@@ -181,48 +179,39 @@ func (m ScenarioUpdateMapper) Map(s *scenario.Scenario) *commands.UpdateScenario
 	return response
 }
 
-type ScenarioDeleteMapper struct{}
-
-func (m ScenarioDeleteMapper) Map() *commands.DeleteScenarioResponse {
+func ScenarioToDeleteResponse() *commands.DeleteScenarioResponse {
 	response := &commands.DeleteScenarioResponse{}
 	response.Body.Success = true
 	return response
 }
 
-type ScenarioGetMapper struct{}
-
-func (m ScenarioGetMapper) Map(s *scenario.Scenario) *queries.GetScenarioResponse {
+func ScenarioToGetResponse(s *scenario.Scenario) *queries.GetScenarioResponse {
 	response := &queries.GetScenarioResponse{}
 	response.Body = buildScenarioDTO(s)
 	return response
 }
 
-type ScenarioListMapper struct {
-	Page int
-	RPP  int
+// ScenarioToListResponse creates a list response with pagination
+func ScenarioToListResponse(page, rpp int) func([]*scenario.Scenario) *queries.ListScenariosResponse {
+	return func(scenarios []*scenario.Scenario) *queries.ListScenariosResponse {
+		response := &queries.ListScenariosResponse{}
+		response.Body.Total = len(scenarios)
+		response.Body.Page = page
+		response.Body.RPP = rpp
+		response.Body.Data = MapSlicePtr(scenarios, buildScenarioDTO)
+		return response
+	}
 }
 
-func (m ScenarioListMapper) Map(scenarios []*scenario.Scenario) *queries.ListScenariosResponse {
-	response := &queries.ListScenariosResponse{}
-	response.Body.Total = len(scenarios)
-	response.Body.Page = m.Page
-	response.Body.RPP = m.RPP
-	response.Body.Data = MapSlicePtr(scenarios, buildScenarioDTO)
-	return response
-}
+// Mapper instances for handler injection
+var (
+	ScenarioCreateMapper = CreateMapperFunc[*scenario.Scenario, *commands.CreateScenarioResponse](ScenarioToCreateResponse)
+	ScenarioUpdateMapper = UpdateMapperFunc[*scenario.Scenario, *commands.UpdateScenarioResponse](ScenarioToUpdateResponse)
+	ScenarioDeleteMapper = DeleteMapperFunc[*commands.DeleteScenarioResponse](ScenarioToDeleteResponse)
+	ScenarioGetMapper    = GetMapperFunc[*scenario.Scenario, *queries.GetScenarioResponse](ScenarioToGetResponse)
+)
 
-func ToCreateScenarioResponse(s *scenario.Scenario) *commands.CreateScenarioResponse {
-	return ScenarioCreateMapper{}.Map(s)
-}
-
-func ToScenarioUpdateResponse(s *scenario.Scenario) *commands.UpdateScenarioResponse {
-	return ScenarioUpdateMapper{}.Map(s)
-}
-
-func ToGetScenarioResponse(s *scenario.Scenario) *queries.GetScenarioResponse {
-	return ScenarioGetMapper{}.Map(s)
-}
-
-func ToListScenarioResponse(scenarios []*scenario.Scenario, page int, rpp int) *queries.ListScenariosResponse {
-	return ScenarioListMapper{Page: page, RPP: rpp}.Map(scenarios)
+// ScenarioListMapperFactory creates a list mapper with pagination
+func ScenarioListMapperFactory(page, rpp int) ListMapperFunc[scenario.Scenario, *queries.ListScenariosResponse] {
+	return ListMapperFunc[scenario.Scenario, *queries.ListScenariosResponse](ScenarioToListResponse(page, rpp))
 }
