@@ -28,17 +28,17 @@ type AgentHandler struct {
 	getAvailableQueryHandler *agentquery.GetAvailableAgentsQueryHandler
 	getStaleQueryHandler     *agentquery.GetStaleAgentsQueryHandler
 
-	// Mappers
-	registerMapper       mappers.AgentRegisterMapper
-	heartbeatMapper      mappers.AgentHeartbeatMapper
-	assignRunMapper      mappers.AgentAssignRunMapper
-	releaseRunMapper     mappers.AgentReleaseRunMapper
-	updateMapper         mappers.AgentUpdateMapper
-	deregisterMapper     mappers.AgentDeregisterMapper
-	getMapper            mappers.AgentGetMapper
-	listMapper           mappers.AgentListMapper
-	availableListMapper  mappers.AgentAvailableListMapper
-	staleListMapper      mappers.AgentStaleListMapper
+	// Mappers - using functional types
+	registerMapper       mappers.CreateMapperFunc[*agent.Agent, *commands.RegisterAgentResponse]
+	heartbeatMapper      mappers.CreateMapperFunc[*agent.Agent, *commands.UpdateHeartbeatResponse]
+	assignRunMapper      mappers.CreateMapperFunc[*agent.Agent, *commands.AssignRunResponse]
+	releaseRunMapper     mappers.CreateMapperFunc[*agent.Agent, *commands.ReleaseRunResponse]
+	updateMapper         mappers.UpdateMapperFunc[*agent.Agent, *commands.UpdateAgentResponse]
+	deregisterMapper     mappers.DeleteMapperFunc[*commands.DeregisterAgentResponse]
+	getMapper            mappers.GetMapperFunc[*agent.Agent, *queries.GetAgentResponse]
+	listMapper           mappers.ListMapperFunc[agent.Agent, *queries.ListAgentsResponse]
+	availableListMapper  mappers.ListMapperFunc[agent.Agent, *queries.GetAvailableAgentsResponse]
+	staleListMapper      mappers.ListMapperFunc[agent.Agent, *queries.GetStaleAgentsResponse]
 }
 
 func NewAgentHandler(
@@ -64,16 +64,16 @@ func NewAgentHandler(
 		listQueryHandler:             listQueryHandler,
 		getAvailableQueryHandler:     getAvailableQueryHandler,
 		getStaleQueryHandler:         getStaleQueryHandler,
-		registerMapper:               mappers.AgentRegisterMapper{},
-		heartbeatMapper:              mappers.AgentHeartbeatMapper{},
-		assignRunMapper:              mappers.AgentAssignRunMapper{},
-		releaseRunMapper:             mappers.AgentReleaseRunMapper{},
-		updateMapper:                 mappers.AgentUpdateMapper{},
-		deregisterMapper:             mappers.AgentDeregisterMapper{},
-		getMapper:                    mappers.AgentGetMapper{},
-		listMapper:                   mappers.AgentListMapper{},
-		availableListMapper:          mappers.AgentAvailableListMapper{},
-		staleListMapper:              mappers.AgentStaleListMapper{},
+		registerMapper:               mappers.AgentRegisterMapper,
+		heartbeatMapper:              mappers.AgentHeartbeatMapper,
+		assignRunMapper:              mappers.AgentAssignRunMapper,
+		releaseRunMapper:             mappers.AgentReleaseRunMapper,
+		updateMapper:                 mappers.AgentUpdateMapper,
+		deregisterMapper:             mappers.AgentDeregisterMapper,
+		getMapper:                    mappers.AgentGetMapper,
+		listMapper:                   mappers.AgentListMapper,
+		availableListMapper:          mappers.AgentAvailableListMapper,
+		staleListMapper:              mappers.AgentStaleListMapper,
 	}
 }
 

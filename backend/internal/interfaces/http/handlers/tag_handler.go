@@ -21,12 +21,12 @@ type TagHandler struct {
 	getQueryHandler  *query.GetTagQueryHandler
 	listQueryHandler *query.ListTagsQueryHandler
 
-	// Mappers
-	createMapper mappers.TagCreateMapper
-	updateMapper mappers.TagUpdateMapper
-	deleteMapper mappers.TagDeleteMapper
-	getMapper    mappers.TagGetMapper
-	listMapper   mappers.TagListMapper
+	// Mappers - using functional types
+	createMapper mappers.CreateMapperFunc[*tag.Tag, *commands.CreateTagResponse]
+	updateMapper mappers.UpdateMapperFunc[*tag.Tag, *commands.UpdateTagResponse]
+	deleteMapper mappers.DeleteMapperFunc[*commands.DeleteTagResponse]
+	getMapper    mappers.GetMapperFunc[*tag.Tag, *queries.GetTagResponse]
+	listMapper   mappers.ListMapperFunc[tag.Tag, *queries.ListTagsResponse]
 }
 
 func NewTagHandler(
@@ -42,11 +42,11 @@ func NewTagHandler(
 		deleteCommandHandler: deleteCommandHandler,
 		getQueryHandler:      getQueryHandler,
 		listQueryHandler:     listQueryHandler,
-		createMapper:         mappers.TagCreateMapper{},
-		updateMapper:         mappers.TagUpdateMapper{},
-		deleteMapper:         mappers.TagDeleteMapper{},
-		getMapper:            mappers.TagGetMapper{},
-		listMapper:           mappers.TagListMapper{},
+		createMapper:         mappers.TagCreateMapper,
+		updateMapper:         mappers.TagUpdateMapper,
+		deleteMapper:         mappers.TagDeleteMapper,
+		getMapper:            mappers.TagGetMapper,
+		listMapper:           mappers.TagListMapper,
 	}
 }
 

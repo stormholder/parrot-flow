@@ -18,10 +18,11 @@ type ScenarioHandler struct {
 	getQueryHandler      *query.GetScenarioQueryHandler
 	listQueryHandler     *query.ListScenariosQueryHandler
 
-	createMapper mappers.ScenarioCreateMapper
-	updateMapper mappers.ScenarioUpdateMapper
-	deleteMapper mappers.ScenarioDeleteMapper
-	getMapper    mappers.ScenarioGetMapper
+	// Mappers - using functional types
+	createMapper mappers.CreateMapperFunc[*scenario.Scenario, *commands.CreateScenarioResponse]
+	updateMapper mappers.UpdateMapperFunc[*scenario.Scenario, *commands.UpdateScenarioResponse]
+	deleteMapper mappers.DeleteMapperFunc[*commands.DeleteScenarioResponse]
+	getMapper    mappers.GetMapperFunc[*scenario.Scenario, *queries.GetScenarioResponse]
 }
 
 func NewScenarioHandler(
@@ -37,10 +38,10 @@ func NewScenarioHandler(
 		deleteCommandHandler: deleteCommandHandler,
 		getQueryHandler:      getQueryHandler,
 		listQueryHandler:     listQueryHandler,
-		createMapper:         mappers.ScenarioCreateMapper{},
-		updateMapper:         mappers.ScenarioUpdateMapper{},
-		deleteMapper:         mappers.ScenarioDeleteMapper{},
-		getMapper:            mappers.ScenarioGetMapper{},
+		createMapper:         mappers.ScenarioCreateMapper,
+		updateMapper:         mappers.ScenarioUpdateMapper,
+		deleteMapper:         mappers.ScenarioDeleteMapper,
+		getMapper:            mappers.ScenarioGetMapper,
 	}
 }
 
@@ -90,7 +91,7 @@ func (h *ScenarioHandler) ListScenarios(ctx context.Context, req *queries.ListSc
 			}}, nil
 		},
 		QueryHandlerFunc[query.ListScenariosQuery, []*scenario.Scenario](h.listQueryHandler.Handle),
-		mappers.ScenarioListMapper{Page: req.Page, RPP: req.RPP},
+		mappers.ScenarioListMapperFactory(req.Page, req.RPP),
 	)
 }
 

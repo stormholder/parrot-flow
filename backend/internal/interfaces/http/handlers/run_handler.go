@@ -18,10 +18,11 @@ type RunHandler struct {
 	getQueryHandler      *query.GetRunQueryHandler
 	listQueryHandler     *query.ListRunsQueryHandler
 
-	createMapper mappers.RunCreateMapper
-	startMapper  mappers.RunStartMapper
-	getMapper    mappers.RunGetMapper
-	listMapper   mappers.RunListMapper
+	// Mappers - using functional types
+	createMapper mappers.CreateMapperFunc[*run.Run, *commands.CreateRunResponse]
+	startMapper  mappers.CreateMapperFunc[*run.Run, *commands.StartRunResponse]
+	getMapper    mappers.GetMapperFunc[*run.Run, *queries.GetRunResponse]
+	listMapper   mappers.ListMapperFunc[run.Run, *queries.ListRunsResponse]
 }
 
 func NewRunHandler(
@@ -35,10 +36,10 @@ func NewRunHandler(
 		startCommandHandler:  startCommandHandler,
 		getQueryHandler:      getQueryHandler,
 		listQueryHandler:     listQueryHandler,
-		createMapper:         mappers.RunCreateMapper{},
-		startMapper:          mappers.RunStartMapper{},
-		getMapper:            mappers.RunGetMapper{},
-		listMapper:           mappers.RunListMapper{},
+		createMapper:         mappers.RunCreateMapper,
+		startMapper:          mappers.RunStartMapper,
+		getMapper:            mappers.RunGetMapper,
+		listMapper:           mappers.RunListMapper,
 	}
 }
 
