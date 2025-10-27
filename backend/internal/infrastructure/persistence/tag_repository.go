@@ -61,16 +61,7 @@ func (r *TagRepository) FindByCategory(ctx context.Context, category tag.TagCate
 		return nil, err
 	}
 
-	tags := make([]*tag.Tag, len(models))
-	for i, model := range models {
-		t, err := ports.TagPersistenceToDomainEntity(&model)
-		if err != nil {
-			return nil, err
-		}
-		tags[i] = t
-	}
-
-	return tags, nil
+	return ConvertSliceToDomainPtr(models, ports.TagPersistenceToDomainEntity)
 }
 
 func (r *TagRepository) FindAll(ctx context.Context) ([]*tag.Tag, error) {
@@ -79,16 +70,7 @@ func (r *TagRepository) FindAll(ctx context.Context) ([]*tag.Tag, error) {
 		return nil, err
 	}
 
-	tags := make([]*tag.Tag, len(models))
-	for i, model := range models {
-		t, err := ports.TagPersistenceToDomainEntity(&model)
-		if err != nil {
-			return nil, err
-		}
-		tags[i] = t
-	}
-
-	return tags, nil
+	return ConvertSliceToDomainPtr(models, ports.TagPersistenceToDomainEntity)
 }
 
 func (r *TagRepository) FindByIDs(ctx context.Context, ids []tag.TagID) ([]*tag.Tag, error) {
@@ -106,16 +88,7 @@ func (r *TagRepository) FindByIDs(ctx context.Context, ids []tag.TagID) ([]*tag.
 		return nil, err
 	}
 
-	tags := make([]*tag.Tag, len(models))
-	for i, model := range models {
-		t, err := ports.TagPersistenceToDomainEntity(&model)
-		if err != nil {
-			return nil, err
-		}
-		tags[i] = t
-	}
-
-	return tags, nil
+	return ConvertSliceToDomainPtr(models, ports.TagPersistenceToDomainEntity)
 }
 
 func (r *TagRepository) Delete(ctx context.Context, id tag.TagID) error {
