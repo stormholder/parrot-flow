@@ -1,6 +1,7 @@
 package command
 
 import (
+	command "parrotflow/internal/application/command"
 	"context"
 	"parrotflow/internal/domain/scenario"
 	"parrotflow/internal/domain/shared"
@@ -70,12 +71,7 @@ func (h *UpdateScenarioCommandHandler) Handle(ctx context.Context, cmd UpdateSce
 		return nil, err
 	}
 
-	for _, event := range scenario.Events {
-		if err := h.eventBus.Publish(event); err != nil {
-			// TODO
-		}
-	}
-
-	scenario.ClearEvents()
+	// Publish domain events using centralized helper
+	command.PublishDomainEvents(h.eventBus, scenario.Events, scenario)
 	return scenario, nil
 }

@@ -4,13 +4,10 @@ import "parrotflow/internal/interfaces/http/dto/shared"
 
 type CreateScenarioRequest struct {
 	Body struct {
-		Name        string                `json:"name"`
-		Description string                `json:"description,omitempty"`
-		Tag         string                `json:"tag,omitempty"`
-		Icon        string                `json:"icon,omitempty"`
-		Context     shared.ContextDTO     `json:"context,omitempty"`
-		InputData   shared.InputDataDTO   `json:"input_data,omitempty"`
-		Parameters  shared.ParametersDTO  `json:"parameters,omitempty"`
+		Name        string `json:"name"`
+		Description string `json:"description,omitempty"`
+		Tag         string `json:"tag,omitempty"`
+		Icon        string `json:"icon,omitempty"`
 	}
 }
 

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	command "parrotflow/internal/application/command"
 	"parrotflow/internal/domain/shared"
 	"parrotflow/internal/domain/tag"
 	utils "parrotflow/pkg/shared"
@@ -64,12 +65,7 @@ func (h *CreateTagCommandHandler) Handle(ctx context.Context, cmd CreateTagComma
 		return nil, err
 	}
 
-	for _, event := range t.Events {
-		if err := h.eventBus.Publish(event); err != nil {
-			// TODO: log error
-		}
-	}
-
-	t.ClearEvents()
+	// Publish domain events using centralized helper
+	command.PublishDomainEvents(h.eventBus, t.Events, t)
 	return t, nil
 }

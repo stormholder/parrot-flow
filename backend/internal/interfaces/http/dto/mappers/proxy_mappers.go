@@ -43,9 +43,9 @@ func buildProxyDTO(p *proxy.Proxy) queries.ProxyDTO {
 	}
 }
 
-type ProxyCreateMapper struct{}
+// Mapper functions using functional approach
 
-func (m ProxyCreateMapper) Map(p *proxy.Proxy) *commands.CreateProxyResponse {
+func ProxyToCreateResponse(p *proxy.Proxy) *commands.CreateProxyResponse {
 	dto := buildProxyDTO(p)
 	response := &commands.CreateProxyResponse{}
 	response.Body.ID = dto.ID
@@ -57,9 +57,7 @@ func (m ProxyCreateMapper) Map(p *proxy.Proxy) *commands.CreateProxyResponse {
 	return response
 }
 
-type ProxyUpdateMapper struct{}
-
-func (m ProxyUpdateMapper) Map(p *proxy.Proxy) *commands.UpdateProxyResponse {
+func ProxyToUpdateResponse(p *proxy.Proxy) *commands.UpdateProxyResponse {
 	dto := buildProxyDTO(p)
 	response := &commands.UpdateProxyResponse{}
 	response.Body.ID = dto.ID
@@ -72,35 +70,27 @@ func (m ProxyUpdateMapper) Map(p *proxy.Proxy) *commands.UpdateProxyResponse {
 	return response
 }
 
-type ProxyDeleteMapper struct{}
-
-func (m ProxyDeleteMapper) Map() *commands.DeleteProxyResponse {
+func ProxyToDeleteResponse() *commands.DeleteProxyResponse {
 	response := &commands.DeleteProxyResponse{}
 	response.Body.Message = "Proxy deleted successfully"
 	return response
 }
 
-type ProxyActivateMapper struct{}
-
-func (m ProxyActivateMapper) Map(p *proxy.Proxy) *commands.ActivateProxyResponse {
+func ProxyToActivateResponse(p *proxy.Proxy) *commands.ActivateProxyResponse {
 	response := &commands.ActivateProxyResponse{}
 	response.Body.ID = p.Id.String()
 	response.Body.Status = p.Status.String()
 	return response
 }
 
-type ProxyDeactivateMapper struct{}
-
-func (m ProxyDeactivateMapper) Map(p *proxy.Proxy) *commands.DeactivateProxyResponse {
+func ProxyToDeactivateResponse(p *proxy.Proxy) *commands.DeactivateProxyResponse {
 	response := &commands.DeactivateProxyResponse{}
 	response.Body.ID = p.Id.String()
 	response.Body.Status = p.Status.String()
 	return response
 }
 
-type ProxyRecordHealthMapper struct{}
-
-func (m ProxyRecordHealthMapper) Map(p *proxy.Proxy) *commands.RecordHealthResponse {
+func ProxyToRecordHealthResponse(p *proxy.Proxy) *commands.RecordHealthResponse {
 	dto := buildProxyDTO(p)
 	response := &commands.RecordHealthResponse{}
 	response.Body.ID = dto.ID
@@ -112,58 +102,33 @@ func (m ProxyRecordHealthMapper) Map(p *proxy.Proxy) *commands.RecordHealthRespo
 	return response
 }
 
-type ProxyGetMapper struct{}
-
-func (m ProxyGetMapper) Map(p *proxy.Proxy) *queries.GetProxyResponse {
+func ProxyToGetResponse(p *proxy.Proxy) *queries.GetProxyResponse {
 	response := &queries.GetProxyResponse{}
 	response.Body = buildProxyDTO(p)
 	return response
 }
 
-type ProxyListMapper struct{}
-
-func (m ProxyListMapper) Map(proxies []*proxy.Proxy) *queries.ListProxiesResponse {
+func ProxyToListResponse(proxies []*proxy.Proxy) *queries.ListProxiesResponse {
 	response := &queries.ListProxiesResponse{}
 	response.Body.Proxies = MapSlicePtr(proxies, buildProxyDTO)
 	return response
 }
 
-type ProxyActiveListMapper struct{}
-
-func (m ProxyActiveListMapper) Map(proxies []*proxy.Proxy) *queries.GetActiveProxiesResponse {
+func ProxyToActiveListResponse(proxies []*proxy.Proxy) *queries.GetActiveProxiesResponse {
 	response := &queries.GetActiveProxiesResponse{}
 	response.Body.Proxies = MapSlicePtr(proxies, buildProxyDTO)
 	return response
 }
 
-func ToCreateProxyResponse(p *proxy.Proxy) *commands.CreateProxyResponse {
-	return ProxyCreateMapper{}.Map(p)
-}
-
-func ToUpdateProxyResponse(p *proxy.Proxy) *commands.UpdateProxyResponse {
-	return ProxyUpdateMapper{}.Map(p)
-}
-
-func ToActivateProxyResponse(p *proxy.Proxy) *commands.ActivateProxyResponse {
-	return ProxyActivateMapper{}.Map(p)
-}
-
-func ToDeactivateProxyResponse(p *proxy.Proxy) *commands.DeactivateProxyResponse {
-	return ProxyDeactivateMapper{}.Map(p)
-}
-
-func ToRecordHealthResponse(p *proxy.Proxy) *commands.RecordHealthResponse {
-	return ProxyRecordHealthMapper{}.Map(p)
-}
-
-func ToGetProxyResponse(p *proxy.Proxy) *queries.GetProxyResponse {
-	return ProxyGetMapper{}.Map(p)
-}
-
-func ToListProxiesResponse(proxies []*proxy.Proxy) *queries.ListProxiesResponse {
-	return ProxyListMapper{}.Map(proxies)
-}
-
-func ToGetActiveProxiesResponse(proxies []*proxy.Proxy) *queries.GetActiveProxiesResponse {
-	return ProxyActiveListMapper{}.Map(proxies)
-}
+// Mapper instances for handler injection - using functional types
+var (
+	ProxyCreateMapper      = CreateMapperFunc[*proxy.Proxy, *commands.CreateProxyResponse](ProxyToCreateResponse)
+	ProxyUpdateMapper      = UpdateMapperFunc[*proxy.Proxy, *commands.UpdateProxyResponse](ProxyToUpdateResponse)
+	ProxyDeleteMapper      = DeleteMapperFunc[*commands.DeleteProxyResponse](ProxyToDeleteResponse)
+	ProxyActivateMapper    = CreateMapperFunc[*proxy.Proxy, *commands.ActivateProxyResponse](ProxyToActivateResponse)
+	ProxyDeactivateMapper  = CreateMapperFunc[*proxy.Proxy, *commands.DeactivateProxyResponse](ProxyToDeactivateResponse)
+	ProxyRecordHealthMapper = CreateMapperFunc[*proxy.Proxy, *commands.RecordHealthResponse](ProxyToRecordHealthResponse)
+	ProxyGetMapper         = GetMapperFunc[*proxy.Proxy, *queries.GetProxyResponse](ProxyToGetResponse)
+	ProxyListMapper        = ListMapperFunc[proxy.Proxy, *queries.ListProxiesResponse](ProxyToListResponse)
+	ProxyActiveListMapper  = ListMapperFunc[proxy.Proxy, *queries.GetActiveProxiesResponse](ProxyToActiveListResponse)
+)

@@ -25,16 +25,16 @@ type ProxyHandler struct {
 	listQueryHandler   *query.ListProxiesQueryHandler
 	activeQueryHandler *query.GetActiveProxiesQueryHandler
 
-	// Mappers
-	createMapper     mappers.ProxyCreateMapper
-	updateMapper     mappers.ProxyUpdateMapper
-	deleteMapper     mappers.ProxyDeleteMapper
-	activateMapper   mappers.ProxyActivateMapper
-	deactivateMapper mappers.ProxyDeactivateMapper
-	recordHealthMapper mappers.ProxyRecordHealthMapper
-	getMapper        mappers.ProxyGetMapper
-	listMapper       mappers.ProxyListMapper
-	activeListMapper mappers.ProxyActiveListMapper
+	// Mappers - using functional types
+	createMapper       mappers.CreateMapperFunc[*proxy.Proxy, *commands.CreateProxyResponse]
+	updateMapper       mappers.UpdateMapperFunc[*proxy.Proxy, *commands.UpdateProxyResponse]
+	deleteMapper       mappers.DeleteMapperFunc[*commands.DeleteProxyResponse]
+	activateMapper     mappers.CreateMapperFunc[*proxy.Proxy, *commands.ActivateProxyResponse]
+	deactivateMapper   mappers.CreateMapperFunc[*proxy.Proxy, *commands.DeactivateProxyResponse]
+	recordHealthMapper mappers.CreateMapperFunc[*proxy.Proxy, *commands.RecordHealthResponse]
+	getMapper          mappers.GetMapperFunc[*proxy.Proxy, *queries.GetProxyResponse]
+	listMapper         mappers.ListMapperFunc[proxy.Proxy, *queries.ListProxiesResponse]
+	activeListMapper   mappers.ListMapperFunc[proxy.Proxy, *queries.GetActiveProxiesResponse]
 }
 
 func NewProxyHandler(
@@ -49,24 +49,24 @@ func NewProxyHandler(
 	activeQueryHandler *query.GetActiveProxiesQueryHandler,
 ) *ProxyHandler {
 	return &ProxyHandler{
-		createCommandHandler:     createCommandHandler,
-		updateCommandHandler:     updateCommandHandler,
-		deleteCommandHandler:     deleteCommandHandler,
-		activateCommandHandler:   activateCommandHandler,
-		deactivateCommandHandler: deactivateCommandHandler,
+		createCommandHandler:       createCommandHandler,
+		updateCommandHandler:       updateCommandHandler,
+		deleteCommandHandler:       deleteCommandHandler,
+		activateCommandHandler:     activateCommandHandler,
+		deactivateCommandHandler:   deactivateCommandHandler,
 		recordHealthCommandHandler: recordHealthCommandHandler,
-		getQueryHandler:          getQueryHandler,
-		listQueryHandler:         listQueryHandler,
-		activeQueryHandler:       activeQueryHandler,
-		createMapper:             mappers.ProxyCreateMapper{},
-		updateMapper:             mappers.ProxyUpdateMapper{},
-		deleteMapper:             mappers.ProxyDeleteMapper{},
-		activateMapper:           mappers.ProxyActivateMapper{},
-		deactivateMapper:         mappers.ProxyDeactivateMapper{},
-		recordHealthMapper:       mappers.ProxyRecordHealthMapper{},
-		getMapper:                mappers.ProxyGetMapper{},
-		listMapper:               mappers.ProxyListMapper{},
-		activeListMapper:         mappers.ProxyActiveListMapper{},
+		getQueryHandler:            getQueryHandler,
+		listQueryHandler:           listQueryHandler,
+		activeQueryHandler:         activeQueryHandler,
+		createMapper:               mappers.ProxyCreateMapper,
+		updateMapper:               mappers.ProxyUpdateMapper,
+		deleteMapper:               mappers.ProxyDeleteMapper,
+		activateMapper:             mappers.ProxyActivateMapper,
+		deactivateMapper:           mappers.ProxyDeactivateMapper,
+		recordHealthMapper:         mappers.ProxyRecordHealthMapper,
+		getMapper:                  mappers.ProxyGetMapper,
+		listMapper:                 mappers.ProxyListMapper,
+		activeListMapper:           mappers.ProxyActiveListMapper,
 	}
 }
 
