@@ -276,3 +276,17 @@ func FromResourceLimitsDTO(dto commands.ResourceLimitsDTO) (agent.ResourceLimits
 func FromConnectionInfoDTO(dto commands.ConnectionInfoDTO) (agent.ConnectionInfo, error) {
 	return agent.NewConnectionInfo(dto.IPAddress, dto.Hostname, dto.QueueName)
 }
+
+// Mapper instances using functional types - eliminates empty struct boilerplate
+var (
+	AgentRegisterMapper       = CreateMapperFunc[*agent.Agent, *commands.RegisterAgentResponse](ToRegisterAgentResponse)
+	AgentHeartbeatMapper      = CreateMapperFunc[*agent.Agent, *commands.UpdateHeartbeatResponse](ToUpdateHeartbeatResponse)
+	AgentAssignRunMapper      = CreateMapperFunc[*agent.Agent, *commands.AssignRunResponse](ToAssignRunResponse)
+	AgentReleaseRunMapper     = CreateMapperFunc[*agent.Agent, *commands.ReleaseRunResponse](ToReleaseRunResponse)
+	AgentUpdateMapper         = UpdateMapperFunc[*agent.Agent, *commands.UpdateAgentResponse](ToUpdateAgentResponse)
+	AgentDeregisterMapper     = DeleteMapperFunc[*commands.DeregisterAgentResponse](ToDeregisterAgentResponse)
+	AgentGetMapper            = GetMapperFunc[*agent.Agent, *queries.GetAgentResponse](ToGetAgentResponse)
+	AgentListMapper           = ListMapperFunc[agent.Agent, *queries.ListAgentsResponse](ToListAgentsResponse)
+	AgentAvailableListMapper  = ListMapperFunc[agent.Agent, *queries.GetAvailableAgentsResponse](ToGetAvailableAgentsResponse)
+	AgentStaleListMapper      = ListMapperFunc[agent.Agent, *queries.GetStaleAgentsResponse](ToGetStaleAgentsResponse)
+)

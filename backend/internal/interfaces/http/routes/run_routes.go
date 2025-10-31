@@ -2,10 +2,6 @@ package routes
 
 import (
 	"net/http"
-	commandRun "parrotflow/internal/application/command/run"
-	queryRun "parrotflow/internal/application/query/run"
-	"parrotflow/internal/infrastructure/events"
-	"parrotflow/internal/infrastructure/persistence"
 	"parrotflow/internal/interfaces/http/handlers"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -16,18 +12,7 @@ var (
 	apiPath = "/api/runs"
 )
 
-func RegisterRunRoutes(
-	api *huma.API,
-	runRepository *persistence.RunRepository,
-	scenarioRepository *persistence.ScenarioRepository,
-	eventBus *events.AsyncEventBus,
-) {
-	runHandler := handlers.NewRunHandler(
-		commandRun.NewCreateRunCommandHandler(runRepository, scenarioRepository, eventBus),
-		commandRun.NewStartRunCommandHandler(runRepository, eventBus),
-		queryRun.NewGetRunQueryHandler(runRepository),
-		queryRun.NewListRunsQueryHandler(runRepository),
-	)
+func RegisterRunRoutes(api *huma.API, runHandler *handlers.RunHandler) {
 
 	huma.Register(*api, huma.Operation{
 		OperationID: "create-run",

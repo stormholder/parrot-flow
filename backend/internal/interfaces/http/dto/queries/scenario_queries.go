@@ -1,17 +1,22 @@
 package queries
 
+import "parrotflow/internal/interfaces/http/dto/shared"
+
 type GetScenarioRequest struct {
 	ID string `path:"id"`
 }
 
 type ScenarioResponseItem struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Tag         string `json:"tag"`
-	Icon        string `json:"icon"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
+	ID          string                `json:"id"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	Tag         string                `json:"tag"`
+	Icon        string                `json:"icon"`
+	Context     shared.ContextDTO     `json:"context"`
+	InputData   shared.InputDataDTO   `json:"input_data"`
+	Parameters  shared.ParametersDTO  `json:"parameters"`
+	CreatedAt   string                `json:"created_at"`
+	UpdatedAt   string                `json:"updated_at"`
 }
 
 type GetScenarioResponse struct {

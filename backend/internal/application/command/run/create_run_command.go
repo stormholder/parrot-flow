@@ -1,6 +1,7 @@
 package command
 
 import (
+	command "parrotflow/internal/application/command"
 	"context"
 	"errors"
 	"parrotflow/internal/domain/run"
@@ -55,12 +56,7 @@ func (h *CreateRunCommandHandler) Handle(ctx context.Context, cmd CreateRunComma
 		return nil, err
 	}
 
-	for _, event := range run.Events {
-		if err := h.eventBus.Publish(event); err != nil {
-			// TODO log
-		}
-	}
-
-	run.ClearEvents()
+	// Publish domain events using centralized helper
+	command.PublishDomainEvents(h.eventBus, run.Events, run)
 	return run, nil
 }

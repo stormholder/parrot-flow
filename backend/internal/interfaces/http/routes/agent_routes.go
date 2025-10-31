@@ -1,47 +1,11 @@
 package routes
 
 import (
-	agentcommand "parrotflow/internal/application/command/agent"
-	agentquery "parrotflow/internal/application/query/agent"
-	"parrotflow/internal/domain/agent"
-	"parrotflow/internal/domain/shared"
-	"parrotflow/internal/interfaces/http/handlers"
-
 	"github.com/danielgtaylor/huma/v2"
+	"parrotflow/internal/interfaces/http/handlers"
 )
 
-func RegisterAgentRoutes(
-	api *huma.API,
-	agentRepository agent.Repository,
-	eventBus shared.EventBus,
-) {
-	// Create command handlers
-	registerCommandHandler := agentcommand.NewRegisterAgentCommandHandler(agentRepository, eventBus)
-	updateHeartbeatCommandHandler := agentcommand.NewUpdateHeartbeatCommandHandler(agentRepository, eventBus)
-	assignRunCommandHandler := agentcommand.NewAssignRunCommandHandler(agentRepository, eventBus)
-	releaseRunCommandHandler := agentcommand.NewReleaseRunCommandHandler(agentRepository, eventBus)
-	updateCommandHandler := agentcommand.NewUpdateAgentCommandHandler(agentRepository, eventBus)
-	deregisterCommandHandler := agentcommand.NewDeregisterAgentCommandHandler(agentRepository, eventBus)
-
-	// Create query handlers
-	getQueryHandler := agentquery.NewGetAgentQueryHandler(agentRepository)
-	listQueryHandler := agentquery.NewListAgentsQueryHandler(agentRepository)
-	getAvailableQueryHandler := agentquery.NewGetAvailableAgentsQueryHandler(agentRepository)
-	getStaleQueryHandler := agentquery.NewGetStaleAgentsQueryHandler(agentRepository)
-
-	// Create handler
-	handler := handlers.NewAgentHandler(
-		registerCommandHandler,
-		updateHeartbeatCommandHandler,
-		assignRunCommandHandler,
-		releaseRunCommandHandler,
-		updateCommandHandler,
-		deregisterCommandHandler,
-		getQueryHandler,
-		listQueryHandler,
-		getAvailableQueryHandler,
-		getStaleQueryHandler,
-	)
+func RegisterAgentRoutes(api *huma.API, handler *handlers.AgentHandler) {
 
 	// Register agent - POST /api/agents/
 	huma.Register(*api, huma.Operation{

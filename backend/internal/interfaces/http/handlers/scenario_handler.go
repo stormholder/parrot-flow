@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+
 	command "parrotflow/internal/application/command/scenario"
 	query "parrotflow/internal/application/query/scenario"
 	"parrotflow/internal/domain/scenario"
@@ -16,6 +17,12 @@ type ScenarioHandler struct {
 	deleteCommandHandler *command.DeleteScenarioCommandHandler
 	getQueryHandler      *query.GetScenarioQueryHandler
 	listQueryHandler     *query.ListScenariosQueryHandler
+
+	// Mappers - using functional types
+	createMapper mappers.CreateMapperFunc[*scenario.Scenario, *commands.CreateScenarioResponse]
+	updateMapper mappers.UpdateMapperFunc[*scenario.Scenario, *commands.UpdateScenarioResponse]
+	deleteMapper mappers.DeleteMapperFunc[*commands.DeleteScenarioResponse]
+	getMapper    mappers.GetMapperFunc[*scenario.Scenario, *queries.GetScenarioResponse]
 }
 
 func NewScenarioHandler(
@@ -31,114 +38,114 @@ func NewScenarioHandler(
 		deleteCommandHandler: deleteCommandHandler,
 		getQueryHandler:      getQueryHandler,
 		listQueryHandler:     listQueryHandler,
+		createMapper:         mappers.ScenarioCreateMapper,
+		updateMapper:         mappers.ScenarioUpdateMapper,
+		deleteMapper:         mappers.ScenarioDeleteMapper,
+		getMapper:            mappers.ScenarioGetMapper,
 	}
 }
 
 func (h *ScenarioHandler) CreateScenario(ctx context.Context, req *commands.CreateScenarioRequest) (*commands.CreateScenarioResponse, error) {
-	cmd := command.CreateScenarioCommand{
-		Name:        req.Body.Name,
-		Description: req.Body.Description,
-		Tag:         req.Body.Tag,
-		Icon:        req.Body.Icon,
-	}
-
-	scenario, err := h.createCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	response := mappers.ToCreateScenarioResponse(scenario)
-
-	return response, nil
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.CreateScenarioRequest) (command.CreateScenarioCommand, error) {
+			return command.CreateScenarioCommand{
+				Name:        r.Body.Name,
+				Description: r.Body.Description,
+				Tag:         r.Body.Tag,
+				Icon:        r.Body.Icon,
+			}, nil
+		},
+		CommandHandlerFunc[command.CreateScenarioCommand, *scenario.Scenario](h.createCommandHandler.Handle),
+		h.createMapper,
+	)
 }
 
 func (h *ScenarioHandler) GetScenario(ctx context.Context, req *queries.GetScenarioRequest) (*queries.GetScenarioResponse, error) {
-	scenarioID, err := scenario.NewScenarioID(req.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	query := query.GetScenarioQuery{
-		ID: scenarioID,
-	}
-
-	scenario, err := h.getQueryHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	response := mappers.ToGetScenarioResponse(scenario)
-
-	return response, nil
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.GetScenarioRequest) (query.GetScenarioQuery, error) {
+			scenarioID, err := scenario.NewScenarioID(r.ID)
+			if err != nil {
+				return query.GetScenarioQuery{}, err
+			}
+			return query.GetScenarioQuery{ID: scenarioID}, nil
+		},
+		QueryHandlerFunc[query.GetScenarioQuery, *scenario.Scenario](h.getQueryHandler.Handle),
+		h.getMapper,
+	)
 }
 
 func (h *ScenarioHandler) ListScenarios(ctx context.Context, req *queries.ListScenariosRequest) (*queries.ListScenariosResponse, error) {
-	criteria := scenario.NewSearchCriteria()
-	if req.Name != "" {
-		criteria = criteria.WithName(req.Name)
-	}
-	if req.Tag != "" {
-		criteria = criteria.WithTag(req.Tag)
-	}
-	if req.Page > 0 {
-		criteria = criteria.WithPagination(req.RPP, (req.Page-1)*req.RPP)
-	}
-
-	query := query.ListScenariosQuery{
-		Criteria: criteria,
-	}
-
-	scenarios, err := h.listQueryHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	response := mappers.ToListScenarioResponse(scenarios, req.Page, req.RPP)
-
-	return response, nil
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.ListScenariosRequest) (query.ListScenariosQuery, error) {
+			limit := r.RPP
+			offset := (r.Page - 1) * r.RPP
+			return query.ListScenariosQuery{Criteria: scenario.SearchCriteria{
+				Limit:  limit,
+				Offset: offset,
+			}}, nil
+		},
+		QueryHandlerFunc[query.ListScenariosQuery, []*scenario.Scenario](h.listQueryHandler.Handle),
+		mappers.ScenarioListMapperFactory(req.Page, req.RPP),
+	)
 }
 
 func (h *ScenarioHandler) UpdateScenario(ctx context.Context, req *commands.UpdateScenarioRequest) (*commands.UpdateScenarioResponse, error) {
-	scenarioID, err := scenario.NewScenarioID(req.ID)
-	if err != nil {
-		return nil, err
-	}
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.UpdateScenarioRequest) (command.UpdateScenarioCommand, error) {
+			scenarioID, err := scenario.NewScenarioID(r.ID)
+			if err != nil {
+				return command.UpdateScenarioCommand{}, err
+			}
 
-	cmd := command.UpdateScenarioCommand{
-		ID:          scenarioID,
-		Name:        req.Body.Name,
-		Description: req.Body.Description,
-		Tag:         req.Body.Tag,
-		Icon:        req.Body.Icon,
-	}
+			cmd := command.UpdateScenarioCommand{
+				ID:          scenarioID,
+				Name:        r.Body.Name,
+				Description: r.Body.Description,
+				Tag:         r.Body.Tag,
+				Icon:        r.Body.Icon,
+			}
 
-	scenario, err := h.updateCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
+			// Map value objects if provided
+			if r.Body.Context != nil {
+				ctx := mappers.MapContextFromDTO(*r.Body.Context)
+				cmd.Context = &ctx
+			}
+			if r.Body.InputData != nil {
+				inputData := mappers.MapInputDataFromDTO(*r.Body.InputData)
+				cmd.InputData = &inputData
+			}
+			if r.Body.Parameters != nil {
+				params := mappers.MapParametersFromDTO(*r.Body.Parameters)
+				cmd.Parameters = &params
+			}
 
-	response := mappers.ToScenarioUpdateResponse(scenario)
-
-	return response, nil
+			return cmd, nil
+		},
+		CommandHandlerFunc[command.UpdateScenarioCommand, *scenario.Scenario](h.updateCommandHandler.Handle),
+		h.updateMapper,
+	)
 }
 
 func (h *ScenarioHandler) DeleteScenario(ctx context.Context, req *commands.DeleteScenarioRequest) (*commands.DeleteScenarioResponse, error) {
-	scenarioID, err := scenario.NewScenarioID(req.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	cmd := command.DeleteScenarioCommand{
-		ID: scenarioID,
-	}
-
-	err = h.deleteCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	response := &commands.DeleteScenarioResponse{}
-	response.Body.Success = true
-
-	return response, nil
+	return HandleSimpleCommand(
+		ctx,
+		req,
+		func(r *commands.DeleteScenarioRequest) (command.DeleteScenarioCommand, error) {
+			scenarioID, err := scenario.NewScenarioID(r.ID)
+			if err != nil {
+				return command.DeleteScenarioCommand{}, err
+			}
+			return command.DeleteScenarioCommand{ID: scenarioID}, nil
+		},
+		SimpleCommandHandlerFunc[command.DeleteScenarioCommand](h.deleteCommandHandler.Handle),
+		h.deleteMapper.Map,
+	)
 }

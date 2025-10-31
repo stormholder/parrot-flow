@@ -6,7 +6,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ActivateProxyResponseBody.json
+            - 'https://example.com/schemas/ActivateProxyResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -30,15 +30,15 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/AgentDTO.json
+            - 'https://example.com/schemas/AgentDTO.json'
           format: uri
           readOnly: true
           type: string
         capabilities:
-          $ref: "#/components/schemas/CapabilitiesDTO"
+          $ref: '#/components/schemas/CapabilitiesDTO'
           description: Agent capabilities
         connection_info:
-          $ref: "#/components/schemas/ConnectionInfoDTO"
+          $ref: '#/components/schemas/ConnectionInfoDTO'
           description: Connection information
         current_run_count:
           description: Current number of runs
@@ -65,7 +65,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         updated_at:
           description: Update timestamp
           type: string
@@ -86,7 +86,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/AssignRunResponseBody.json
+            - 'https://example.com/schemas/AssignRunResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -121,7 +121,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         type:
           description: Browser type
           enum:
@@ -143,25 +143,25 @@ components:
         browsers:
           description: Supported browsers
           items:
-            $ref: "#/components/schemas/BrowserCapabilityDTO"
+            $ref: '#/components/schemas/BrowserCapabilityDTO'
           type:
             - array
-            - "null"
+            - 'null'
         features:
           description: Additional features
           items:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         os:
-          $ref: "#/components/schemas/OSInfoDTO"
+          $ref: '#/components/schemas/OSInfoDTO'
           description: Operating system information
         proxy:
-          $ref: "#/components/schemas/ProxyCapabilityDTO"
+          $ref: '#/components/schemas/ProxyCapabilityDTO'
           description: Proxy support
         resource:
-          $ref: "#/components/schemas/ResourceLimitsDTO"
+          $ref: '#/components/schemas/ResourceLimitsDTO'
           description: Resource limits
       required:
         - browsers
@@ -184,13 +184,32 @@ components:
       required:
         - queue_name
       type: object
+    ContextDTO:
+      additionalProperties: false
+      properties:
+        blocks:
+          items:
+            $ref: '#/components/schemas/NodeDTO'
+          type:
+            - array
+            - 'null'
+        edges:
+          items:
+            $ref: '#/components/schemas/EdgeDTO'
+          type:
+            - array
+            - 'null'
+      required:
+        - blocks
+        - edges
+      type: object
     CreateProxyRequestBody:
       additionalProperties: false
       properties:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/CreateProxyRequestBody.json
+            - 'https://example.com/schemas/CreateProxyRequestBody.json'
           format: uri
           readOnly: true
           type: string
@@ -225,7 +244,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         username:
           description: Optional username for authentication
           type: string
@@ -241,7 +260,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/CreateProxyResponseBody.json
+            - 'https://example.com/schemas/CreateProxyResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -291,7 +310,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         updated_at:
           description: Last update timestamp
           type: string
@@ -316,7 +335,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/CreateRunRequestBody.json
+            - 'https://example.com/schemas/CreateRunRequestBody.json'
           format: uri
           readOnly: true
           type: string
@@ -334,7 +353,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/CreateRunResponseBody.json
+            - 'https://example.com/schemas/CreateRunResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -361,16 +380,22 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/CreateScenarioRequestBody.json
+            - 'https://example.com/schemas/CreateScenarioRequestBody.json'
           format: uri
           readOnly: true
           type: string
+        context:
+          $ref: '#/components/schemas/ContextDTO'
         description:
           type: string
         icon:
           type: string
+        input_data:
+          $ref: '#/components/schemas/InputDataDTO'
         name:
           type: string
+        parameters:
+          $ref: '#/components/schemas/ParametersDTO'
         tag:
           type: string
       required:
@@ -382,10 +407,12 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/CreateScenarioResponseBody.json
+            - 'https://example.com/schemas/CreateScenarioResponseBody.json'
           format: uri
           readOnly: true
           type: string
+        context:
+          $ref: '#/components/schemas/ContextDTO'
         created_at:
           type: string
         description:
@@ -394,8 +421,12 @@ components:
           type: string
         id:
           type: string
+        input_data:
+          $ref: '#/components/schemas/InputDataDTO'
         name:
           type: string
+        parameters:
+          $ref: '#/components/schemas/ParametersDTO'
         tag:
           type: string
         updated_at:
@@ -406,6 +437,9 @@ components:
         - description
         - tag
         - icon
+        - context
+        - input_data
+        - parameters
         - created_at
         - updated_at
       type: object
@@ -415,7 +449,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/CreateTagRequestBody.json
+            - 'https://example.com/schemas/CreateTagRequestBody.json'
           format: uri
           readOnly: true
           type: string
@@ -429,13 +463,13 @@ components:
           type: string
         color:
           description: Hex color (#RRGGBB)
-          pattern: ^#[0-9A-Fa-f]{6}$
+          pattern: '^#[0-9A-Fa-f]{6}$'
           type: string
         description:
           description: Tag description
           type: string
         name:
-          description: Tag name (lowercase, unique)
+          description: 'Tag name (lowercase, unique)'
           maxLength: 100
           minLength: 1
           type: string
@@ -449,7 +483,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/CreateTagResponseBody.json
+            - 'https://example.com/schemas/CreateTagResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -485,7 +519,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/DeactivateProxyResponseBody.json
+            - 'https://example.com/schemas/DeactivateProxyResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -509,7 +543,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/DeleteProxyResponseBody.json
+            - 'https://example.com/schemas/DeleteProxyResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -525,7 +559,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/DeleteScenarioResponseBody.json
+            - 'https://example.com/schemas/DeleteScenarioResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -540,7 +574,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/DeleteTagResponseBody.json
+            - 'https://example.com/schemas/DeleteTagResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -555,7 +589,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/DeregisterAgentResponseBody.json
+            - 'https://example.com/schemas/DeregisterAgentResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -565,11 +599,35 @@ components:
       required:
         - message
       type: object
+    EdgeDTO:
+      additionalProperties: false
+      properties:
+        condition:
+          type: string
+        id:
+          type: string
+        source:
+          type: string
+        source_handle:
+          type: string
+        target:
+          type: string
+        target_handle:
+          type: string
+      required:
+        - id
+        - source
+        - target
+        - source_handle
+        - target_handle
+      type: object
     ErrorDetail:
       additionalProperties: false
       properties:
         location:
-          description: Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
+          description: >-
+            Where the error occurred, e.g. 'body.items[3].tags' or
+            'path.thing-id'
           type: string
         message:
           description: Error message text
@@ -583,26 +641,30 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ErrorModel.json
+            - 'https://example.com/schemas/ErrorModel.json'
           format: uri
           readOnly: true
           type: string
         detail:
-          description: A human-readable explanation specific to this occurrence of the problem.
+          description: >-
+            A human-readable explanation specific to this occurrence of the
+            problem.
           examples:
             - Property foo is required but is missing.
           type: string
         errors:
           description: Optional list of individual error details
           items:
-            $ref: "#/components/schemas/ErrorDetail"
+            $ref: '#/components/schemas/ErrorDetail'
           type:
             - array
-            - "null"
+            - 'null'
         instance:
-          description: A URI reference that identifies the specific occurrence of the problem.
+          description: >-
+            A URI reference that identifies the specific occurrence of the
+            problem.
           examples:
-            - https://example.com/error-log/abc123
+            - 'https://example.com/error-log/abc123'
           format: uri
           type: string
         status:
@@ -612,15 +674,17 @@ components:
           format: int64
           type: integer
         title:
-          description: A short, human-readable summary of the problem type. This value should not change between occurrences of the error.
+          description: >-
+            A short, human-readable summary of the problem type. This value
+            should not change between occurrences of the error.
           examples:
             - Bad Request
           type: string
         type:
-          default: about:blank
+          default: 'about:blank'
           description: A URI reference to human-readable documentation for the error.
           examples:
-            - https://example.com/errors/example
+            - 'https://example.com/errors/example'
           format: uri
           type: string
       type: object
@@ -630,17 +694,17 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/GetActiveProxiesResponseBody.json
+            - 'https://example.com/schemas/GetActiveProxiesResponseBody.json'
           format: uri
           readOnly: true
           type: string
         proxies:
           description: List of active proxies
           items:
-            $ref: "#/components/schemas/ProxyDTO"
+            $ref: '#/components/schemas/ProxyDTO'
           type:
             - array
-            - "null"
+            - 'null'
         total:
           description: Total number of active proxies
           format: int64
@@ -655,17 +719,17 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/GetAvailableAgentsResponseBody.json
+            - 'https://example.com/schemas/GetAvailableAgentsResponseBody.json'
           format: uri
           readOnly: true
           type: string
         agents:
           description: List of available agents
           items:
-            $ref: "#/components/schemas/AgentDTO"
+            $ref: '#/components/schemas/AgentDTO'
           type:
             - array
-            - "null"
+            - 'null'
         count:
           description: Total number of available agents
           format: int64
@@ -680,7 +744,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/GetRunResponseBody.json
+            - 'https://example.com/schemas/GetRunResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -714,17 +778,17 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/GetStaleAgentsResponseBody.json
+            - 'https://example.com/schemas/GetStaleAgentsResponseBody.json'
           format: uri
           readOnly: true
           type: string
         agents:
           description: List of stale agents
           items:
-            $ref: "#/components/schemas/AgentDTO"
+            $ref: '#/components/schemas/AgentDTO'
           type:
             - array
-            - "null"
+            - 'null'
         count:
           description: Total number of stale agents
           format: int64
@@ -739,7 +803,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/GetTagResponseBody.json
+            - 'https://example.com/schemas/GetTagResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -775,17 +839,29 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/GreetingOutputBody.json
+            - 'https://example.com/schemas/GreetingOutputBody.json'
           format: uri
           readOnly: true
           type: string
         message:
           description: Greeting message
           examples:
-            - Hello, world!
+            - 'Hello, world!'
           type: string
       required:
         - message
+      type: object
+    InputDataDTO:
+      additionalProperties: false
+      properties:
+        parameters:
+          items:
+            $ref: '#/components/schemas/NodeParametersDTO'
+          type:
+            - array
+            - 'null'
+      required:
+        - parameters
       type: object
     ListAgentsResponseBody:
       additionalProperties: false
@@ -793,17 +869,17 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ListAgentsResponseBody.json
+            - 'https://example.com/schemas/ListAgentsResponseBody.json'
           format: uri
           readOnly: true
           type: string
         agents:
           description: List of agents
           items:
-            $ref: "#/components/schemas/AgentDTO"
+            $ref: '#/components/schemas/AgentDTO'
           type:
             - array
-            - "null"
+            - 'null'
         count:
           description: Total number of agents
           format: int64
@@ -818,17 +894,17 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ListProxiesResponseBody.json
+            - 'https://example.com/schemas/ListProxiesResponseBody.json'
           format: uri
           readOnly: true
           type: string
         proxies:
           description: List of proxies
           items:
-            $ref: "#/components/schemas/ProxyDTO"
+            $ref: '#/components/schemas/ProxyDTO'
           type:
             - array
-            - "null"
+            - 'null'
         total:
           description: Total number of proxies returned
           format: int64
@@ -843,16 +919,16 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ListRunsResponseBody.json
+            - 'https://example.com/schemas/ListRunsResponseBody.json'
           format: uri
           readOnly: true
           type: string
         data:
           items:
-            $ref: "#/components/schemas/RunListItem"
+            $ref: '#/components/schemas/RunListItem'
           type:
             - array
-            - "null"
+            - 'null'
         page:
           format: int64
           type: integer
@@ -874,16 +950,16 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ListScenariosResponseBody.json
+            - 'https://example.com/schemas/ListScenariosResponseBody.json'
           format: uri
           readOnly: true
           type: string
         data:
           items:
-            $ref: "#/components/schemas/ScenarioResponseItem"
+            $ref: '#/components/schemas/ScenarioResponseItem'
           type:
             - array
-            - "null"
+            - 'null'
         page:
           format: int64
           type: integer
@@ -905,18 +981,54 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ListTagsResponseBody.json
+            - 'https://example.com/schemas/ListTagsResponseBody.json'
           format: uri
           readOnly: true
           type: string
         tags:
           items:
-            $ref: "#/components/schemas/TagDTO"
+            $ref: '#/components/schemas/TagDTO'
           type:
             - array
-            - "null"
+            - 'null'
       required:
         - tags
+      type: object
+    NodeDTO:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        node_type:
+          type: string
+        position:
+          $ref: '#/components/schemas/Point2D'
+      required:
+        - id
+        - node_type
+        - position
+      type: object
+    NodeParametersDTO:
+      additionalProperties: false
+      properties:
+        block_id:
+          type: string
+        input:
+          items:
+            $ref: '#/components/schemas/ParameterDTO'
+          type:
+            - array
+            - 'null'
+        output:
+          items:
+            $ref: '#/components/schemas/ParameterDTO'
+          type:
+            - array
+            - 'null'
+      required:
+        - block_id
+        - input
+        - output
       type: object
     OSInfoDTO:
       additionalProperties: false
@@ -926,7 +1038,7 @@ components:
           enum:
             - amd64
             - arm64
-            - "386"
+            - '386'
             - arm
           type: string
         platform:
@@ -944,6 +1056,66 @@ components:
         - architecture
         - version
       type: object
+    ParameterDTO:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        value: {}
+      required:
+        - name
+        - value
+      type: object
+    ParameterItemDTO:
+      additionalProperties: false
+      properties:
+        param_type:
+          type: string
+        parameter:
+          $ref: '#/components/schemas/ParameterDTO'
+        values:
+          items:
+            type: string
+          type:
+            - array
+            - 'null'
+      required:
+        - parameter
+        - param_type
+        - values
+      type: object
+    ParametersDTO:
+      additionalProperties: false
+      properties:
+        input:
+          items:
+            $ref: '#/components/schemas/ParameterItemDTO'
+          type:
+            - array
+            - 'null'
+        output:
+          items:
+            $ref: '#/components/schemas/ParameterItemDTO'
+          type:
+            - array
+            - 'null'
+      required:
+        - input
+        - output
+      type: object
+    Point2D:
+      additionalProperties: false
+      properties:
+        x:
+          format: float
+          type: number
+        'y':
+          format: float
+          type: number
+      required:
+        - x
+        - 'y'
+      type: object
     ProxyCapabilityDTO:
       additionalProperties: false
       properties:
@@ -953,7 +1125,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         supports_proxy:
           description: Whether proxy is supported
           type: boolean
@@ -966,7 +1138,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ProxyDTO.json
+            - 'https://example.com/schemas/ProxyDTO.json'
           format: uri
           readOnly: true
           type: string
@@ -1007,7 +1179,7 @@ components:
           format: int64
           type: integer
         protocol:
-          description: Proxy protocol (http, https, socks5)
+          description: 'Proxy protocol (http, https, socks5)'
           type: string
         status:
           description: Current proxy status
@@ -1022,7 +1194,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         updated_at:
           description: Last update timestamp
           type: string
@@ -1048,7 +1220,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/RecordHealthRequestBody.json
+            - 'https://example.com/schemas/RecordHealthRequestBody.json'
           format: uri
           readOnly: true
           type: string
@@ -1072,7 +1244,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/RecordHealthResponseBody.json
+            - 'https://example.com/schemas/RecordHealthResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -1122,7 +1294,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         updated_at:
           description: Last update timestamp
           type: string
@@ -1147,15 +1319,15 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/RegisterAgentRequestBody.json
+            - 'https://example.com/schemas/RegisterAgentRequestBody.json'
           format: uri
           readOnly: true
           type: string
         capabilities:
-          $ref: "#/components/schemas/CapabilitiesDTO"
+          $ref: '#/components/schemas/CapabilitiesDTO'
           description: Agent capabilities
         connection_info:
-          $ref: "#/components/schemas/ConnectionInfoDTO"
+          $ref: '#/components/schemas/ConnectionInfoDTO'
           description: Agent connection information
         name:
           description: Agent name
@@ -1173,15 +1345,15 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/RegisterAgentResponseBody.json
+            - 'https://example.com/schemas/RegisterAgentResponseBody.json'
           format: uri
           readOnly: true
           type: string
         capabilities:
-          $ref: "#/components/schemas/CapabilitiesDTO"
+          $ref: '#/components/schemas/CapabilitiesDTO'
           description: Agent capabilities
         connection_info:
-          $ref: "#/components/schemas/ConnectionInfoDTO"
+          $ref: '#/components/schemas/ConnectionInfoDTO'
           description: Agent connection information
         id:
           description: Agent ID
@@ -1209,7 +1381,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ReleaseRunResponseBody.json
+            - 'https://example.com/schemas/ReleaseRunResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -1285,10 +1457,12 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/ScenarioResponseItem.json
+            - 'https://example.com/schemas/ScenarioResponseItem.json'
           format: uri
           readOnly: true
           type: string
+        context:
+          $ref: '#/components/schemas/ContextDTO'
         created_at:
           type: string
         description:
@@ -1297,8 +1471,12 @@ components:
           type: string
         id:
           type: string
+        input_data:
+          $ref: '#/components/schemas/InputDataDTO'
         name:
           type: string
+        parameters:
+          $ref: '#/components/schemas/ParametersDTO'
         tag:
           type: string
         updated_at:
@@ -1309,6 +1487,9 @@ components:
         - description
         - tag
         - icon
+        - context
+        - input_data
+        - parameters
         - created_at
         - updated_at
       type: object
@@ -1318,7 +1499,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/StartRunResponseBody.json
+            - 'https://example.com/schemas/StartRunResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -1368,12 +1549,12 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateAgentRequestBody.json
+            - 'https://example.com/schemas/UpdateAgentRequestBody.json'
           format: uri
           readOnly: true
           type: string
         capabilities:
-          $ref: "#/components/schemas/CapabilitiesDTO"
+          $ref: '#/components/schemas/CapabilitiesDTO'
           description: Agent capabilities
         name:
           description: Agent name
@@ -1386,14 +1567,14 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         tags_to_remove:
           description: Tag IDs to remove
           items:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
       type: object
     UpdateAgentResponseBody:
       additionalProperties: false
@@ -1401,12 +1582,12 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateAgentResponseBody.json
+            - 'https://example.com/schemas/UpdateAgentResponseBody.json'
           format: uri
           readOnly: true
           type: string
         capabilities:
-          $ref: "#/components/schemas/CapabilitiesDTO"
+          $ref: '#/components/schemas/CapabilitiesDTO'
           description: Agent capabilities
         id:
           description: Agent ID
@@ -1423,7 +1604,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         updated_at:
           description: Update timestamp
           type: string
@@ -1441,7 +1622,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateHeartbeatResponseBody.json
+            - 'https://example.com/schemas/UpdateHeartbeatResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -1469,7 +1650,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateProxyRequestBody.json
+            - 'https://example.com/schemas/UpdateProxyRequestBody.json'
           format: uri
           readOnly: true
           type: string
@@ -1508,7 +1689,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateProxyResponseBody.json
+            - 'https://example.com/schemas/UpdateProxyResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -1558,7 +1739,7 @@ components:
             type: string
           type:
             - array
-            - "null"
+            - 'null'
         updated_at:
           description: Last update timestamp
           type: string
@@ -1583,16 +1764,22 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateScenarioRequestBody.json
+            - 'https://example.com/schemas/UpdateScenarioRequestBody.json'
           format: uri
           readOnly: true
           type: string
+        context:
+          $ref: '#/components/schemas/ContextDTO'
         description:
           type: string
         icon:
           type: string
+        input_data:
+          $ref: '#/components/schemas/InputDataDTO'
         name:
           type: string
+        parameters:
+          $ref: '#/components/schemas/ParametersDTO'
         tag:
           type: string
       type: object
@@ -1602,18 +1789,24 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateScenarioResponseBody.json
+            - 'https://example.com/schemas/UpdateScenarioResponseBody.json'
           format: uri
           readOnly: true
           type: string
+        context:
+          $ref: '#/components/schemas/ContextDTO'
         description:
           type: string
         icon:
           type: string
         id:
           type: string
+        input_data:
+          $ref: '#/components/schemas/InputDataDTO'
         name:
           type: string
+        parameters:
+          $ref: '#/components/schemas/ParametersDTO'
         tag:
           type: string
         updated_at:
@@ -1624,6 +1817,9 @@ components:
         - description
         - tag
         - icon
+        - context
+        - input_data
+        - parameters
         - updated_at
       type: object
     UpdateTagRequestBody:
@@ -1632,13 +1828,13 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateTagRequestBody.json
+            - 'https://example.com/schemas/UpdateTagRequestBody.json'
           format: uri
           readOnly: true
           type: string
         color:
           description: Hex color (#RRGGBB)
-          pattern: ^#[0-9A-Fa-f]{6}$
+          pattern: '^#[0-9A-Fa-f]{6}$'
           type: string
         description:
           description: Tag description
@@ -1650,7 +1846,7 @@ components:
         $schema:
           description: A URL to the JSON Schema for this object.
           examples:
-            - https://example.com/schemas/UpdateTagResponseBody.json
+            - 'https://example.com/schemas/UpdateTagResponseBody.json'
           format: uri
           readOnly: true
           type: string
@@ -1687,24 +1883,26 @@ paths:
       description: Root endpoint for the Parrot Flow API
       operationId: root
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GreetingOutputBody"
+                $ref: '#/components/schemas/GreetingOutputBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Root
       tags:
         - system
   /api/agents/:
     get:
-      description: Lists all agents with optional filters (status, browser_type, platform, tags, only_healthy)
+      description: >-
+        Lists all agents with optional filters (status, browser_type, platform,
+        tags, only_healthy)
       operationId: list-agents
       parameters:
         - description: Filter by status
@@ -1757,49 +1955,53 @@ paths:
             description: Comma-separated tag IDs
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListAgentsResponseBody"
+                $ref: '#/components/schemas/ListAgentsResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: List agents
       tags:
         - agents
     post:
-      description: Registers a new agent with the system (auto-registration on first heartbeat)
+      description: >-
+        Registers a new agent with the system (auto-registration on first
+        heartbeat)
       operationId: register-agent
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegisterAgentRequestBody"
+              $ref: '#/components/schemas/RegisterAgentRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RegisterAgentResponseBody"
+                $ref: '#/components/schemas/RegisterAgentResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Register a new agent
       tags:
         - agents
   /api/agents/available:
     get:
-      description: Retrieves agents that can accept new runs, with optional filters (browser_type, platform, tags)
+      description: >-
+        Retrieves agents that can accept new runs, with optional filters
+        (browser_type, platform, tags)
       operationId: get-available-agents
       parameters:
         - description: Filter by browser type
@@ -1832,17 +2034,17 @@ paths:
             description: Comma-separated tag IDs
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetAvailableAgentsResponseBody"
+                $ref: '#/components/schemas/GetAvailableAgentsResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Get available agents
       tags:
@@ -1863,22 +2065,22 @@ paths:
             minimum: 1
             type: integer
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetStaleAgentsResponseBody"
+                $ref: '#/components/schemas/GetStaleAgentsResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Get stale agents
       tags:
         - agents
-  /api/agents/{id}:
+  '/api/agents/{id}':
     delete:
       description: Marks the agent as offline and deregisters it from the system
       operationId: deregister-agent
@@ -1891,17 +2093,17 @@ paths:
             description: Agent ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeregisterAgentResponseBody"
+                $ref: '#/components/schemas/DeregisterAgentResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Deregister an agent
       tags:
@@ -1918,24 +2120,24 @@ paths:
             description: Agent ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AgentDTO"
+                $ref: '#/components/schemas/AgentDTO'
                 description: Agent details
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Get an agent by ID
       tags:
         - agents
     patch:
-      description: Updates agent properties (name, capabilities, tags)
+      description: 'Updates agent properties (name, capabilities, tags)'
       operationId: update-agent
       parameters:
         - description: Agent ID
@@ -1949,27 +2151,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateAgentRequestBody"
+              $ref: '#/components/schemas/UpdateAgentRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdateAgentResponseBody"
+                $ref: '#/components/schemas/UpdateAgentResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Update an agent
       tags:
         - agents
-  /api/agents/{id}/assign-run:
+  '/api/agents/{id}/assign-run':
     post:
-      description: Assigns a run to the agent, incrementing its run count and updating status
+      description: >-
+        Assigns a run to the agent, incrementing its run count and updating
+        status
       operationId: assign-run-to-agent
       parameters:
         - description: Agent ID
@@ -1980,24 +2184,26 @@ paths:
             description: Agent ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AssignRunResponseBody"
+                $ref: '#/components/schemas/AssignRunResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Assign a run to an agent
       tags:
         - agents
-  /api/agents/{id}/heartbeat:
+  '/api/agents/{id}/heartbeat':
     post:
-      description: Updates the agent's last heartbeat timestamp and auto-recovers from disconnected status
+      description: >-
+        Updates the agent's last heartbeat timestamp and auto-recovers from
+        disconnected status
       operationId: update-agent-heartbeat
       parameters:
         - description: Agent ID
@@ -2008,24 +2214,26 @@ paths:
             description: Agent ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdateHeartbeatResponseBody"
+                $ref: '#/components/schemas/UpdateHeartbeatResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Update agent heartbeat
       tags:
         - agents
-  /api/agents/{id}/release-run:
+  '/api/agents/{id}/release-run':
     post:
-      description: Releases a run from the agent, decrementing its run count and updating status
+      description: >-
+        Releases a run from the agent, decrementing its run count and updating
+        status
       operationId: release-run-from-agent
       parameters:
         - description: Agent ID
@@ -2036,17 +2244,17 @@ paths:
             description: Agent ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ReleaseRunResponseBody"
+                $ref: '#/components/schemas/ReleaseRunResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Release a run from an agent
       tags:
@@ -2078,44 +2286,46 @@ paths:
               type: string
             type:
               - array
-              - "null"
+              - 'null'
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListProxiesResponseBody"
+                $ref: '#/components/schemas/ListProxiesResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: List proxies
       tags:
         - proxies
     post:
-      description: Creates a new proxy server configuration with optional authentication credentials and tags
+      description: >-
+        Creates a new proxy server configuration with optional authentication
+        credentials and tags
       operationId: create-proxy
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateProxyRequestBody"
+              $ref: '#/components/schemas/CreateProxyRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateProxyResponseBody"
+                $ref: '#/components/schemas/CreateProxyResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Create a new proxy
       tags:
@@ -2125,22 +2335,22 @@ paths:
       description: Retrieves all proxies with active status
       operationId: get-active-proxies
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetActiveProxiesResponseBody"
+                $ref: '#/components/schemas/GetActiveProxiesResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Get active proxies
       tags:
         - proxies
-  /api/proxies/{id}:
+  '/api/proxies/{id}':
     delete:
       description: Deletes a proxy configuration
       operationId: delete-proxy
@@ -2153,17 +2363,17 @@ paths:
             description: Proxy ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeleteProxyResponseBody"
+                $ref: '#/components/schemas/DeleteProxyResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Delete proxy
       tags:
@@ -2180,23 +2390,25 @@ paths:
             description: Proxy ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProxyDTO"
+                $ref: '#/components/schemas/ProxyDTO'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Get proxy by ID
       tags:
         - proxies
     patch:
-      description: Updates an existing proxy's configuration (name, host, port, protocol, credentials)
+      description: >-
+        Updates an existing proxy's configuration (name, host, port, protocol,
+        credentials)
       operationId: update-proxy
       parameters:
         - description: Proxy ID
@@ -2210,27 +2422,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateProxyRequestBody"
+              $ref: '#/components/schemas/UpdateProxyRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdateProxyResponseBody"
+                $ref: '#/components/schemas/UpdateProxyResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Update proxy
       tags:
         - proxies
-  /api/proxies/{id}/activate:
+  '/api/proxies/{id}/activate':
     post:
-      description: Activates a proxy, making it available for use
+      description: 'Activates a proxy, making it available for use'
       operationId: activate-proxy
       parameters:
         - description: Proxy ID
@@ -2241,24 +2453,24 @@ paths:
             description: Proxy ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ActivateProxyResponseBody"
+                $ref: '#/components/schemas/ActivateProxyResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Activate proxy
       tags:
         - proxies
-  /api/proxies/{id}/deactivate:
+  '/api/proxies/{id}/deactivate':
     post:
-      description: Deactivates a proxy, removing it from the available pool
+      description: 'Deactivates a proxy, removing it from the available pool'
       operationId: deactivate-proxy
       parameters:
         - description: Proxy ID
@@ -2269,22 +2481,22 @@ paths:
             description: Proxy ID
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeactivateProxyResponseBody"
+                $ref: '#/components/schemas/DeactivateProxyResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Deactivate proxy
       tags:
         - proxies
-  /api/proxies/{id}/health:
+  '/api/proxies/{id}/health':
     post:
       description: Records the result of a health check (success or failure) for a proxy
       operationId: record-proxy-health
@@ -2300,20 +2512,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RecordHealthRequestBody"
+              $ref: '#/components/schemas/RecordHealthRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecordHealthResponseBody"
+                $ref: '#/components/schemas/RecordHealthResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Record health check
       tags:
@@ -2346,17 +2558,17 @@ paths:
             format: int64
             type: integer
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListRunsResponseBody"
+                $ref: '#/components/schemas/ListRunsResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: List runs
       tags:
@@ -2368,25 +2580,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateRunRequestBody"
+              $ref: '#/components/schemas/CreateRunRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateRunResponseBody"
+                $ref: '#/components/schemas/CreateRunResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Create a new run
       tags:
         - ScenarioRun
-  /api/runs/{id}:
+  '/api/runs/{id}':
     get:
       description: Retrieve a specific run by its ID
       operationId: get-run
@@ -2397,22 +2609,22 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetRunResponseBody"
+                $ref: '#/components/schemas/GetRunResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Get a run by ID
       tags:
         - ScenarioRun
-  /api/runs/{id}/start:
+  '/api/runs/{id}/start':
     post:
       description: Start execution of a run
       operationId: start-run
@@ -2423,17 +2635,17 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StartRunResponseBody"
+                $ref: '#/components/schemas/StartRunResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Start a run
       tags:
@@ -2466,17 +2678,17 @@ paths:
             format: int64
             type: integer
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListScenariosResponseBody"
+                $ref: '#/components/schemas/ListScenariosResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: List scenarios
       tags:
@@ -2488,25 +2700,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateScenarioRequestBody"
+              $ref: '#/components/schemas/CreateScenarioRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateScenarioResponseBody"
+                $ref: '#/components/schemas/CreateScenarioResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Create a new scenario
       tags:
         - scenarios
-  /api/scenarios/{id}:
+  '/api/scenarios/{id}':
     delete:
       description: Delete a scenario by its ID
       operationId: delete-scenario
@@ -2517,17 +2729,17 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeleteScenarioResponseBody"
+                $ref: '#/components/schemas/DeleteScenarioResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Delete a scenario
       tags:
@@ -2542,17 +2754,17 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ScenarioResponseItem"
+                $ref: '#/components/schemas/ScenarioResponseItem'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Get a scenario by ID
       tags:
@@ -2570,20 +2782,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateScenarioRequestBody"
+              $ref: '#/components/schemas/UpdateScenarioRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdateScenarioResponseBody"
+                $ref: '#/components/schemas/UpdateScenarioResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Update a scenario
       tags:
@@ -2606,17 +2818,17 @@ paths:
               - region
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListTagsResponseBody"
+                $ref: '#/components/schemas/ListTagsResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: List tags
       tags:
@@ -2628,25 +2840,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateTagRequestBody"
+              $ref: '#/components/schemas/CreateTagRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateTagResponseBody"
+                $ref: '#/components/schemas/CreateTagResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Create a new tag
       tags:
         - tags
-  /api/tags/{id}:
+  '/api/tags/{id}':
     delete:
       description: Delete a tag by its ID (system tags cannot be deleted)
       operationId: delete-tag
@@ -2657,17 +2869,17 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeleteTagResponseBody"
+                $ref: '#/components/schemas/DeleteTagResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Delete a tag
       tags:
@@ -2682,17 +2894,17 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetTagResponseBody"
+                $ref: '#/components/schemas/GetTagResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Get a tag by ID
       tags:
@@ -2710,20 +2922,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateTagRequestBody"
+              $ref: '#/components/schemas/UpdateTagRequestBody'
         required: true
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdateTagResponseBody"
+                $ref: '#/components/schemas/UpdateTagResponseBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Update a tag
       tags:
@@ -2733,17 +2945,17 @@ paths:
       description: Check the health status of the API
       operationId: health
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GreetingOutputBody"
+                $ref: '#/components/schemas/GreetingOutputBody'
           description: OK
         default:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: '#/components/schemas/ErrorModel'
           description: Error
       summary: Health Check
       tags:

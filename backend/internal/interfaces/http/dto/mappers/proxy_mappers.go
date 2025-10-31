@@ -6,149 +6,25 @@ import (
 	"parrotflow/internal/interfaces/http/dto/queries"
 )
 
-// ToCreateProxyResponse converts a domain Proxy to CreateProxyResponse
-func ToCreateProxyResponse(p *proxy.Proxy) *commands.CreateProxyResponse {
-	response := &commands.CreateProxyResponse{}
-	response.Body.ID = p.Id.String()
-	response.Body.Name = p.Name
-	response.Body.Host = p.Host
-	response.Body.Port = p.Port
-	response.Body.Protocol = p.Protocol.String()
-	response.Body.Status = p.Status.String()
-	response.Body.HasCredentials = p.Credentials != nil
-	response.Body.FailureCount = p.FailureCount
-	response.Body.SuccessCount = p.SuccessCount
-	response.Body.AverageLatency = p.AverageLatency
-	response.Body.CreatedAt = p.CreatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-	response.Body.UpdatedAt = p.UpdatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-
-	// Convert tags
-	response.Body.Tags = make([]string, len(p.Tags))
-	for i, tagID := range p.Tags {
-		response.Body.Tags[i] = tagID.String()
-	}
-
-	// Convert LastCheckedAt if present
+func buildProxyDTO(p *proxy.Proxy) queries.ProxyDTO {
+	var lastChecked *string
 	if p.LastCheckedAt != nil {
-		formatted := p.LastCheckedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-		response.Body.LastCheckedAt = &formatted
+		s := FormatTimestamp(p.LastCheckedAt.Time())
+		lastChecked = &s
 	}
 
-	return response
-}
+	var lastFailure *string
+	if p.LastFailureAt != nil {
+		s := FormatTimestamp(p.LastFailureAt.Time())
+		lastFailure = &s
+	}
 
-// ToUpdateProxyResponse converts a domain Proxy to UpdateProxyResponse
-func ToUpdateProxyResponse(p *proxy.Proxy) *commands.UpdateProxyResponse {
-	response := &commands.UpdateProxyResponse{}
-	response.Body.ID = p.Id.String()
-	response.Body.Name = p.Name
-	response.Body.Host = p.Host
-	response.Body.Port = p.Port
-	response.Body.Protocol = p.Protocol.String()
-	response.Body.Status = p.Status.String()
-	response.Body.HasCredentials = p.Credentials != nil
-	response.Body.FailureCount = p.FailureCount
-	response.Body.SuccessCount = p.SuccessCount
-	response.Body.AverageLatency = p.AverageLatency
-	response.Body.CreatedAt = p.CreatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-	response.Body.UpdatedAt = p.UpdatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-
-	// Convert tags
-	response.Body.Tags = make([]string, len(p.Tags))
+	tagStrings := make([]string, len(p.Tags))
 	for i, tagID := range p.Tags {
-		response.Body.Tags[i] = tagID.String()
+		tagStrings[i] = tagID.String()
 	}
 
-	// Convert LastCheckedAt if present
-	if p.LastCheckedAt != nil {
-		formatted := p.LastCheckedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-		response.Body.LastCheckedAt = &formatted
-	}
-
-	return response
-}
-
-// ToRecordHealthResponse converts a domain Proxy to RecordHealthResponse
-func ToRecordHealthResponse(p *proxy.Proxy) *commands.RecordHealthResponse {
-	response := &commands.RecordHealthResponse{}
-	response.Body.ID = p.Id.String()
-	response.Body.Name = p.Name
-	response.Body.Host = p.Host
-	response.Body.Port = p.Port
-	response.Body.Protocol = p.Protocol.String()
-	response.Body.Status = p.Status.String()
-	response.Body.HasCredentials = p.Credentials != nil
-	response.Body.FailureCount = p.FailureCount
-	response.Body.SuccessCount = p.SuccessCount
-	response.Body.AverageLatency = p.AverageLatency
-	response.Body.CreatedAt = p.CreatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-	response.Body.UpdatedAt = p.UpdatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-
-	// Convert tags
-	response.Body.Tags = make([]string, len(p.Tags))
-	for i, tagID := range p.Tags {
-		response.Body.Tags[i] = tagID.String()
-	}
-
-	// Convert LastCheckedAt if present
-	if p.LastCheckedAt != nil {
-		formatted := p.LastCheckedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-		response.Body.LastCheckedAt = &formatted
-	}
-
-	return response
-}
-
-// ToActivateProxyResponse converts a domain Proxy to ActivateProxyResponse
-func ToActivateProxyResponse(p *proxy.Proxy) *commands.ActivateProxyResponse {
-	response := &commands.ActivateProxyResponse{}
-	response.Body.ID = p.Id.String()
-	response.Body.Name = p.Name
-	response.Body.Status = p.Status.String()
-	return response
-}
-
-// ToDeactivateProxyResponse converts a domain Proxy to DeactivateProxyResponse
-func ToDeactivateProxyResponse(p *proxy.Proxy) *commands.DeactivateProxyResponse {
-	response := &commands.DeactivateProxyResponse{}
-	response.Body.ID = p.Id.String()
-	response.Body.Name = p.Name
-	response.Body.Status = p.Status.String()
-	return response
-}
-
-// ToGetProxyResponse converts a domain Proxy to GetProxyResponse
-func ToGetProxyResponse(p *proxy.Proxy) *queries.GetProxyResponse {
-	response := &queries.GetProxyResponse{}
-	response.Body = toProxyDTO(p)
-	return response
-}
-
-// ToListProxiesResponse converts a slice of domain Proxies to ListProxiesResponse
-func ToListProxiesResponse(proxies []*proxy.Proxy) *queries.ListProxiesResponse {
-	response := &queries.ListProxiesResponse{}
-	response.Body.Proxies = make([]queries.ProxyDTO, len(proxies))
-	for i, p := range proxies {
-		response.Body.Proxies[i] = toProxyDTO(p)
-	}
-	response.Body.Total = len(proxies)
-	return response
-}
-
-// ToGetActiveProxiesResponse converts a slice of domain Proxies to GetActiveProxiesResponse
-func ToGetActiveProxiesResponse(proxies []*proxy.Proxy) *queries.GetActiveProxiesResponse {
-	response := &queries.GetActiveProxiesResponse{}
-	response.Body.Proxies = make([]queries.ProxyDTO, len(proxies))
-	for i, p := range proxies {
-		response.Body.Proxies[i] = toProxyDTO(p)
-	}
-	response.Body.Total = len(proxies)
-	return response
-}
-
-// toProxyDTO converts a domain Proxy to ProxyDTO (helper function)
-func toProxyDTO(p *proxy.Proxy) queries.ProxyDTO {
-	dto := queries.ProxyDTO{
+	return queries.ProxyDTO{
 		ID:             p.Id.String(),
 		Name:           p.Name,
 		Host:           p.Host,
@@ -157,30 +33,102 @@ func toProxyDTO(p *proxy.Proxy) queries.ProxyDTO {
 		Status:         p.Status.String(),
 		ConnectionURL:  p.GetConnectionURL(),
 		HasCredentials: p.Credentials != nil,
+		Tags:           tagStrings,
+		LastCheckedAt:  lastChecked,
+		LastFailureAt:  lastFailure,
 		FailureCount:   p.FailureCount,
 		SuccessCount:   p.SuccessCount,
 		AverageLatency: p.AverageLatency,
-		CreatedAt:      p.CreatedAt.Time().Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt:      p.UpdatedAt.Time().Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt:      FormatTimestamp(p.CreatedAt.Time()),
 	}
-
-	// Convert tags
-	dto.Tags = make([]string, len(p.Tags))
-	for i, tagID := range p.Tags {
-		dto.Tags[i] = tagID.String()
-	}
-
-	// Convert LastCheckedAt if present
-	if p.LastCheckedAt != nil {
-		formatted := p.LastCheckedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-		dto.LastCheckedAt = &formatted
-	}
-
-	// Convert LastFailureAt if present
-	if p.LastFailureAt != nil {
-		formatted := p.LastFailureAt.Time().Format("2006-01-02T15:04:05Z07:00")
-		dto.LastFailureAt = &formatted
-	}
-
-	return dto
 }
+
+// Mapper functions using functional approach
+
+func ProxyToCreateResponse(p *proxy.Proxy) *commands.CreateProxyResponse {
+	dto := buildProxyDTO(p)
+	response := &commands.CreateProxyResponse{}
+	response.Body.ID = dto.ID
+	response.Body.Name = dto.Name
+	response.Body.Host = dto.Host
+	response.Body.Port = dto.Port
+	response.Body.Protocol = dto.Protocol
+	response.Body.Status = dto.Status
+	return response
+}
+
+func ProxyToUpdateResponse(p *proxy.Proxy) *commands.UpdateProxyResponse {
+	dto := buildProxyDTO(p)
+	response := &commands.UpdateProxyResponse{}
+	response.Body.ID = dto.ID
+	response.Body.Name = dto.Name
+	response.Body.Host = dto.Host
+	response.Body.Port = dto.Port
+	response.Body.Protocol = dto.Protocol
+	response.Body.Status = dto.Status
+	response.Body.Tags = dto.Tags
+	return response
+}
+
+func ProxyToDeleteResponse() *commands.DeleteProxyResponse {
+	response := &commands.DeleteProxyResponse{}
+	response.Body.Message = "Proxy deleted successfully"
+	return response
+}
+
+func ProxyToActivateResponse(p *proxy.Proxy) *commands.ActivateProxyResponse {
+	response := &commands.ActivateProxyResponse{}
+	response.Body.ID = p.Id.String()
+	response.Body.Status = p.Status.String()
+	return response
+}
+
+func ProxyToDeactivateResponse(p *proxy.Proxy) *commands.DeactivateProxyResponse {
+	response := &commands.DeactivateProxyResponse{}
+	response.Body.ID = p.Id.String()
+	response.Body.Status = p.Status.String()
+	return response
+}
+
+func ProxyToRecordHealthResponse(p *proxy.Proxy) *commands.RecordHealthResponse {
+	dto := buildProxyDTO(p)
+	response := &commands.RecordHealthResponse{}
+	response.Body.ID = dto.ID
+	response.Body.Status = dto.Status
+	response.Body.FailureCount = dto.FailureCount
+	response.Body.SuccessCount = dto.SuccessCount
+	response.Body.AverageLatency = dto.AverageLatency
+	response.Body.LastCheckedAt = dto.LastCheckedAt
+	return response
+}
+
+func ProxyToGetResponse(p *proxy.Proxy) *queries.GetProxyResponse {
+	response := &queries.GetProxyResponse{}
+	response.Body = buildProxyDTO(p)
+	return response
+}
+
+func ProxyToListResponse(proxies []*proxy.Proxy) *queries.ListProxiesResponse {
+	response := &queries.ListProxiesResponse{}
+	response.Body.Proxies = MapSlicePtr(proxies, buildProxyDTO)
+	return response
+}
+
+func ProxyToActiveListResponse(proxies []*proxy.Proxy) *queries.GetActiveProxiesResponse {
+	response := &queries.GetActiveProxiesResponse{}
+	response.Body.Proxies = MapSlicePtr(proxies, buildProxyDTO)
+	return response
+}
+
+// Mapper instances for handler injection - using functional types
+var (
+	ProxyCreateMapper      = CreateMapperFunc[*proxy.Proxy, *commands.CreateProxyResponse](ProxyToCreateResponse)
+	ProxyUpdateMapper      = UpdateMapperFunc[*proxy.Proxy, *commands.UpdateProxyResponse](ProxyToUpdateResponse)
+	ProxyDeleteMapper      = DeleteMapperFunc[*commands.DeleteProxyResponse](ProxyToDeleteResponse)
+	ProxyActivateMapper    = CreateMapperFunc[*proxy.Proxy, *commands.ActivateProxyResponse](ProxyToActivateResponse)
+	ProxyDeactivateMapper  = CreateMapperFunc[*proxy.Proxy, *commands.DeactivateProxyResponse](ProxyToDeactivateResponse)
+	ProxyRecordHealthMapper = CreateMapperFunc[*proxy.Proxy, *commands.RecordHealthResponse](ProxyToRecordHealthResponse)
+	ProxyGetMapper         = GetMapperFunc[*proxy.Proxy, *queries.GetProxyResponse](ProxyToGetResponse)
+	ProxyListMapper        = ListMapperFunc[proxy.Proxy, *queries.ListProxiesResponse](ProxyToListResponse)
+	ProxyActiveListMapper  = ListMapperFunc[proxy.Proxy, *queries.GetActiveProxiesResponse](ProxyToActiveListResponse)
+)

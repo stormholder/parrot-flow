@@ -32,31 +32,48 @@ func (h *CreateScenarioCommandHandler) Handle(ctx context.Context, cmd CreateSce
 		return nil, err
 	}
 
-	scenario, err := scenario.NewScenario(scenarioID, cmd.Name)
+	s, err := scenario.NewScenario(scenarioID, cmd.Name)
 	if err != nil {
 		return nil, err
 	}
 
 	if cmd.Description != "" {
-		scenario.UpdateDescription(cmd.Description)
+		s.UpdateDescription(cmd.Description)
 	}
 	if cmd.Tag != "" {
-		scenario.UpdateTag(cmd.Tag)
+		s.UpdateTag(cmd.Tag)
 	}
 	if cmd.Icon != "" {
-		scenario.UpdateIcon(cmd.Icon)
+		s.UpdateIcon(cmd.Icon)
 	}
 
-	if err := h.repository.Save(ctx, scenario); err != nil {
+	// Initialize default value objects
+	// Context with single "startNode"
+	startNode, err := scenario.NewNode("startNode", "start", scenario.NewPoint2D(0, 0))
+	if err != nil {
+		return nil, err
+	}
+	defaultContext := scenario.NewContext([]scenario.Node{startNode}, []scenario.Edge{})
+	s.UpdateContext(defaultContext)
+
+	// Empty InputData
+	defaultInputData := scenario.NewInputData([]scenario.NodeParameters{})
+	s.UpdateInputData(defaultInputData)
+
+	// Empty Parameters with empty input/output arrays
+	defaultParameters := scenario.NewParameters([]scenario.ParameterItem{}, []scenario.ParameterItem{})
+	s.UpdateParameters(defaultParameters)
+
+	if err := h.repository.Save(ctx, s); err != nil {
 		return nil, err
 	}
 
-	for _, event := range scenario.Events {
+	for _, event := range s.Events {
 		if err := h.eventBus.Publish(event); err != nil {
 			// TODO log only or handle it somehow?
 		}
 	}
 
-	scenario.ClearEvents()
-	return scenario, nil
+	s.ClearEvents()
+	return s, nil
 }

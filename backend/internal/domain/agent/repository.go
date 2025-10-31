@@ -6,6 +6,16 @@ import (
 	"time"
 )
 
+// SearchCriteria defines filtering options for agent queries
+type SearchCriteria struct {
+	Status           *AgentStatus
+	TagIDs           []tag.TagID
+	BrowserType      *BrowserType
+	Platform         *Platform
+	OnlyHealthy      bool
+	HeartbeatTimeout time.Duration
+}
+
 // Repository defines the interface for agent persistence
 type Repository interface {
 	// Save persists an agent
@@ -19,6 +29,10 @@ type Repository interface {
 
 	// FindAll retrieves all agents
 	FindAll(ctx context.Context) ([]*Agent, error)
+
+	// FindByCriteria retrieves agents matching the specified criteria
+	// Supports multiple filters combined (status AND tags AND browser, etc.)
+	FindByCriteria(ctx context.Context, criteria SearchCriteria) ([]*Agent, error)
 
 	// FindByStatus retrieves agents by status
 	FindByStatus(ctx context.Context, status AgentStatus) ([]*Agent, error)

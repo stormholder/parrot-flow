@@ -94,6 +94,64 @@ func (r *AgentRepository) FindAll(ctx context.Context) ([]*agent.Agent, error) {
 	return agents, nil
 }
 
+// FindByCriteria retrieves agents matching the specified criteria
+// Supports combining multiple filters (status AND tags AND browser, etc.)
+func (r *AgentRepository) FindByCriteria(ctx context.Context, criteria agent.SearchCriteria) ([]*agent.Agent, error) {
+	query := r.db.WithContext(ctx).Preload("Tags")
+
+	// Apply status filter if specified
+	if criteria.Status != nil {
+		query = query.Where("status = ?", criteria.Status.String())
+	}
+
+	// Apply tag filter if specified
+	if len(criteria.TagIDs) > 0 {
+		tagIDs := make([]uint64, len(criteria.TagIDs))
+		for i, tagID := range criteria.TagIDs {
+			tagIDs[i] = ports.TagParseID(tagID.String())
+		}
+		// Find agents that have ALL specified tags
+		query = query.Joins("JOIN agent_tags ON agent_tags.agent_id = agents.id").
+			Where("agent_tags.tag_id IN ?", tagIDs).
+			Group("agents.id").
+			Having("COUNT(DISTINCT agent_tags.tag_id) = ?", len(tagIDs))
+	}
+
+	// Apply browser type filter if specified
+	if criteria.BrowserType != nil {
+		query = query.Where("capabilities::jsonb @> ?", `{"browsers":[{"type":"`+criteria.BrowserType.String()+`"}]}`)
+	}
+
+	// Apply platform filter if specified
+	if criteria.Platform != nil {
+		query = query.Where("capabilities::jsonb @> ?", `{"os":{"platform":"`+criteria.Platform.String()+`"}}`)
+	}
+
+	var models []models.Agent
+	if err := query.Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	// Convert to domain entities
+	agents, err := ConvertSliceToDomainPtr(models, ports.AgentPersistenceToDomainEntity)
+	if err != nil {
+		return nil, err
+	}
+
+	// Apply health filter if requested (in-memory filtering)
+	if criteria.OnlyHealthy && criteria.HeartbeatTimeout > 0 {
+		healthyAgents := make([]*agent.Agent, 0, len(agents))
+		for _, a := range agents {
+			if a.IsHealthy(criteria.HeartbeatTimeout) {
+				healthyAgents = append(healthyAgents, a)
+			}
+		}
+		return healthyAgents, nil
+	}
+
+	return agents, nil
+}
+
 func (r *AgentRepository) FindByStatus(ctx context.Context, status agent.AgentStatus) ([]*agent.Agent, error) {
 	var models []models.Agent
 	if err := r.db.WithContext(ctx).Preload("Tags").Where("status = ?", status.String()).Find(&models).Error; err != nil {

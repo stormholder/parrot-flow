@@ -6,58 +6,71 @@ import (
 	"parrotflow/internal/interfaces/http/dto/queries"
 )
 
-func ToCreateTagResponse(t *tag.Tag) *commands.CreateTagResponse {
-	response := &commands.CreateTagResponse{}
-	response.Body.ID = t.Id.String()
-	response.Body.Name = t.Name
-	response.Body.Category = t.Category.String()
-	response.Body.Description = t.Description
-	response.Body.Color = t.Color
-	response.Body.IsSystem = t.IsSystem
-	response.Body.CreatedAt = t.CreatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-	response.Body.UpdatedAt = t.UpdatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-	return response
-}
-
-func ToUpdateTagResponse(t *tag.Tag) *commands.UpdateTagResponse {
-	response := &commands.UpdateTagResponse{}
-	response.Body.ID = t.Id.String()
-	response.Body.Name = t.Name
-	response.Body.Category = t.Category.String()
-	response.Body.Description = t.Description
-	response.Body.Color = t.Color
-	response.Body.IsSystem = t.IsSystem
-	response.Body.UpdatedAt = t.UpdatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-	return response
-}
-
-func ToGetTagResponse(t *tag.Tag) *queries.GetTagResponse {
-	response := &queries.GetTagResponse{}
-	response.Body.ID = t.Id.String()
-	response.Body.Name = t.Name
-	response.Body.Category = t.Category.String()
-	response.Body.Description = t.Description
-	response.Body.Color = t.Color
-	response.Body.IsSystem = t.IsSystem
-	response.Body.CreatedAt = t.CreatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-	response.Body.UpdatedAt = t.UpdatedAt.Time().Format("2006-01-02T15:04:05Z07:00")
-	return response
-}
-
-func ToListTagsResponse(tags []*tag.Tag) *queries.ListTagsResponse {
-	response := &queries.ListTagsResponse{}
-	response.Body.Tags = make([]queries.TagDTO, len(tags))
-	for i, t := range tags {
-		response.Body.Tags[i] = queries.TagDTO{
-			ID:          t.Id.String(),
-			Name:        t.Name,
-			Category:    t.Category.String(),
-			Description: t.Description,
-			Color:       t.Color,
-			IsSystem:    t.IsSystem,
-			CreatedAt:   t.CreatedAt.Time().Format("2006-01-02T15:04:05Z07:00"),
-			UpdatedAt:   t.UpdatedAt.Time().Format("2006-01-02T15:04:05Z07:00"),
-		}
+func buildTagDTO(t *tag.Tag) queries.TagDTO {
+	return queries.TagDTO{
+		ID:          t.Id.String(),
+		Name:        t.Name,
+		Category:    t.Category.String(),
+		Description: t.Description,
+		Color:       t.Color,
+		IsSystem:    t.IsSystem,
+		CreatedAt:   FormatTimestamp(t.CreatedAt.Time()),
+		UpdatedAt:   FormatTimestamp(t.UpdatedAt.Time()),
 	}
+}
+
+// Mapper functions using functional approach instead of empty structs
+
+func TagToCreateResponse(t *tag.Tag) *commands.CreateTagResponse {
+	dto := buildTagDTO(t)
+	response := &commands.CreateTagResponse{}
+	response.Body.ID = dto.ID
+	response.Body.Name = dto.Name
+	response.Body.Category = dto.Category
+	response.Body.Description = dto.Description
+	response.Body.Color = dto.Color
+	response.Body.IsSystem = dto.IsSystem
+	response.Body.CreatedAt = dto.CreatedAt
+	response.Body.UpdatedAt = dto.UpdatedAt
 	return response
 }
+
+func TagToUpdateResponse(t *tag.Tag) *commands.UpdateTagResponse {
+	dto := buildTagDTO(t)
+	response := &commands.UpdateTagResponse{}
+	response.Body.ID = dto.ID
+	response.Body.Name = dto.Name
+	response.Body.Category = dto.Category
+	response.Body.Description = dto.Description
+	response.Body.Color = dto.Color
+	response.Body.IsSystem = dto.IsSystem
+	response.Body.UpdatedAt = dto.UpdatedAt
+	return response
+}
+
+func TagToDeleteResponse() *commands.DeleteTagResponse {
+	response := &commands.DeleteTagResponse{}
+	response.Body.Success = true
+	return response
+}
+
+func TagToGetResponse(t *tag.Tag) *queries.GetTagResponse {
+	response := &queries.GetTagResponse{}
+	response.Body = buildTagDTO(t)
+	return response
+}
+
+func TagToListResponse(tags []*tag.Tag) *queries.ListTagsResponse {
+	response := &queries.ListTagsResponse{}
+	response.Body.Tags = MapSlicePtr(tags, buildTagDTO)
+	return response
+}
+
+// Mapper instances for handler injection - using functional types
+var (
+	TagCreateMapper = CreateMapperFunc[*tag.Tag, *commands.CreateTagResponse](TagToCreateResponse)
+	TagUpdateMapper = UpdateMapperFunc[*tag.Tag, *commands.UpdateTagResponse](TagToUpdateResponse)
+	TagDeleteMapper = DeleteMapperFunc[*commands.DeleteTagResponse](TagToDeleteResponse)
+	TagGetMapper    = GetMapperFunc[*tag.Tag, *queries.GetTagResponse](TagToGetResponse)
+	TagListMapper   = ListMapperFunc[tag.Tag, *queries.ListTagsResponse](TagToListResponse)
+)

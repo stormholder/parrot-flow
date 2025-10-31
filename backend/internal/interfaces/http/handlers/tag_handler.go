@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+
 	command "parrotflow/internal/application/command/tag"
 	query "parrotflow/internal/application/query/tag"
 	"parrotflow/internal/domain/tag"
@@ -11,11 +12,21 @@ import (
 )
 
 type TagHandler struct {
+	// Command handlers
 	createCommandHandler *command.CreateTagCommandHandler
 	updateCommandHandler *command.UpdateTagCommandHandler
 	deleteCommandHandler *command.DeleteTagCommandHandler
-	getQueryHandler      *query.GetTagQueryHandler
-	listQueryHandler     *query.ListTagsQueryHandler
+
+	// Query handlers
+	getQueryHandler  *query.GetTagQueryHandler
+	listQueryHandler *query.ListTagsQueryHandler
+
+	// Mappers - using functional types
+	createMapper mappers.CreateMapperFunc[*tag.Tag, *commands.CreateTagResponse]
+	updateMapper mappers.UpdateMapperFunc[*tag.Tag, *commands.UpdateTagResponse]
+	deleteMapper mappers.DeleteMapperFunc[*commands.DeleteTagResponse]
+	getMapper    mappers.GetMapperFunc[*tag.Tag, *queries.GetTagResponse]
+	listMapper   mappers.ListMapperFunc[tag.Tag, *queries.ListTagsResponse]
 }
 
 func NewTagHandler(
@@ -31,99 +42,99 @@ func NewTagHandler(
 		deleteCommandHandler: deleteCommandHandler,
 		getQueryHandler:      getQueryHandler,
 		listQueryHandler:     listQueryHandler,
+		createMapper:         mappers.TagCreateMapper,
+		updateMapper:         mappers.TagUpdateMapper,
+		deleteMapper:         mappers.TagDeleteMapper,
+		getMapper:            mappers.TagGetMapper,
+		listMapper:           mappers.TagListMapper,
 	}
 }
 
 func (h *TagHandler) CreateTag(ctx context.Context, req *commands.CreateTagRequest) (*commands.CreateTagResponse, error) {
-	cmd := command.CreateTagCommand{
-		Name:        req.Body.Name,
-		Category:    req.Body.Category,
-		Description: req.Body.Description,
-		Color:       req.Body.Color,
-	}
-
-	t, err := h.createCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	return mappers.ToCreateTagResponse(t), nil
-}
-
-func (h *TagHandler) GetTag(ctx context.Context, req *queries.GetTagRequest) (*queries.GetTagResponse, error) {
-	tagID, err := tag.NewTagID(req.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	q := query.GetTagQuery{
-		ID: tagID,
-	}
-
-	t, err := h.getQueryHandler.Handle(ctx, q)
-	if err != nil {
-		return nil, err
-	}
-
-	return mappers.ToGetTagResponse(t), nil
-}
-
-func (h *TagHandler) ListTags(ctx context.Context, req *queries.ListTagsRequest) (*queries.ListTagsResponse, error) {
-	q := query.ListTagsQuery{}
-
-	if req.Category != "" {
-		category, err := tag.NewTagCategory(req.Category)
-		if err != nil {
-			return nil, err
-		}
-		q.Category = &category
-	}
-
-	tags, err := h.listQueryHandler.Handle(ctx, q)
-	if err != nil {
-		return nil, err
-	}
-
-	return mappers.ToListTagsResponse(tags), nil
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.CreateTagRequest) (command.CreateTagCommand, error) {
+			return command.CreateTagCommand{
+				Name:        r.Body.Name,
+				Category:    r.Body.Category,
+				Description: r.Body.Description,
+				Color:       r.Body.Color,
+			}, nil
+		},
+		CommandHandlerFunc[command.CreateTagCommand, *tag.Tag](h.createCommandHandler.Handle),
+		h.createMapper,
+	)
 }
 
 func (h *TagHandler) UpdateTag(ctx context.Context, req *commands.UpdateTagRequest) (*commands.UpdateTagResponse, error) {
-	tagID, err := tag.NewTagID(req.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	cmd := command.UpdateTagCommand{
-		ID:          tagID,
-		Description: req.Body.Description,
-		Color:       req.Body.Color,
-	}
-
-	t, err := h.updateCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	return mappers.ToUpdateTagResponse(t), nil
+	return HandleCommand(
+		ctx,
+		req,
+		func(r *commands.UpdateTagRequest) (command.UpdateTagCommand, error) {
+			tagID, err := tag.NewTagID(r.ID)
+			if err != nil {
+				return command.UpdateTagCommand{}, err
+			}
+			return command.UpdateTagCommand{
+				ID:          tagID,
+				Description: r.Body.Description,
+				Color:       r.Body.Color,
+			}, nil
+		},
+		CommandHandlerFunc[command.UpdateTagCommand, *tag.Tag](h.updateCommandHandler.Handle),
+		h.updateMapper,
+	)
 }
 
 func (h *TagHandler) DeleteTag(ctx context.Context, req *commands.DeleteTagRequest) (*commands.DeleteTagResponse, error) {
-	tagID, err := tag.NewTagID(req.ID)
-	if err != nil {
-		return nil, err
-	}
+	return HandleSimpleCommand(
+		ctx,
+		req,
+		func(r *commands.DeleteTagRequest) (command.DeleteTagCommand, error) {
+			tagID, err := tag.NewTagID(r.ID)
+			if err != nil {
+				return command.DeleteTagCommand{}, err
+			}
+			return command.DeleteTagCommand{ID: tagID}, nil
+		},
+		SimpleCommandHandlerFunc[command.DeleteTagCommand](h.deleteCommandHandler.Handle),
+		h.deleteMapper.Map,
+	)
+}
 
-	cmd := command.DeleteTagCommand{
-		ID: tagID,
-	}
+func (h *TagHandler) GetTag(ctx context.Context, req *queries.GetTagRequest) (*queries.GetTagResponse, error) {
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.GetTagRequest) (query.GetTagQuery, error) {
+			tagID, err := tag.NewTagID(r.ID)
+			if err != nil {
+				return query.GetTagQuery{}, err
+			}
+			return query.GetTagQuery{ID: tagID}, nil
+		},
+		QueryHandlerFunc[query.GetTagQuery, *tag.Tag](h.getQueryHandler.Handle),
+		h.getMapper,
+	)
+}
 
-	err = h.deleteCommandHandler.Handle(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	response := &commands.DeleteTagResponse{}
-	response.Body.Success = true
-
-	return response, nil
+func (h *TagHandler) ListTags(ctx context.Context, req *queries.ListTagsRequest) (*queries.ListTagsResponse, error) {
+	return HandleQuery(
+		ctx,
+		req,
+		func(r *queries.ListTagsRequest) (query.ListTagsQuery, error) {
+			q := query.ListTagsQuery{}
+			if r.Category != "" {
+				category, err := tag.NewTagCategory(r.Category)
+				if err != nil {
+					return query.ListTagsQuery{}, err
+				}
+				q.Category = &category
+			}
+			return q, nil
+		},
+		QueryHandlerFunc[query.ListTagsQuery, []*tag.Tag](h.listQueryHandler.Handle),
+		h.listMapper,
+	)
 }
